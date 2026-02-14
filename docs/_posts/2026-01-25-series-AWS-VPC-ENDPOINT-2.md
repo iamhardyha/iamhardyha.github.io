@@ -1,7 +1,7 @@
 
 ---
 layout: post
-title: "[AWS 시리즈] "
+title: "[AWS 시리즈] AWS VPC 엔드포인트 완벽 이해 (2) – 게이트웨이/인터페이스 엔드포인트 실전 구축과 비용·보안 전략"
 date: 2026-01-25
 categories: [infra]
 tags: [AWS, VPC, VPCENDPOINT, GATEWAY]
