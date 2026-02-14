@@ -38,8 +38,10 @@ kramdown:
 
 permalink: /:categories/:year/:month/:day/:title/
 
-paginate: 10
-paginate_path: "/page:num/"
+#custom_css:
+#  - /assets/css/kakao-style.css  # 이 줄 추가
+paginate: 12
+paginate_path: /page:num/
 
 post_search: true
 
