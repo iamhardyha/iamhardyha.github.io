@@ -1,0 +1,42 @@
+---
+layout: default
+---
+
+<div class="home">
+  {{ content }}
+
+  <ul class="post-list">
+    {% for post in paginator.posts %}
+    <li class="post-item">
+      <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">
+        {{ post.date | date: "%Y-%m-%d" }}
+      </time>
+      <h2 class="post-title">
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </h2>
+      {% if post.categories.size > 0 %}
+      <span class="post-meta">
+        {% for cat in post.categories %}
+        <span class="category">{{ cat }}</span>
+        {% endfor %}
+      </span>
+      {% endif %}
+      {% if post.excerpt %}
+      <p class="post-excerpt">{{ post.excerpt | strip_html | truncatewords: 30 }}</p>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% if paginator.total_pages > 1 %}
+  <nav class="pagination">
+    {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | relative_url }}">&laquo; Prev</a>
+    {% endif %}
+    <span class="page-number">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+    {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | relative_url }}">Next &raquo;</a>
+    {% endif %}
+  </nav>
+  {% endif %}
+</div>

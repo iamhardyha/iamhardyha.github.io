@@ -1,0 +1,23 @@
+title: iamhardyha
+description: Tech blog about software engineering
+url: "https://iamhardyha.github.io"
+baseurl: ""
+
+markdown: kramdown
+kramdown:
+  syntax_highlighter: rouge
+  input: GFM
+
+permalink: /:categories/:year/:month/:day/:title/
+
+paginate: 10
+paginate_path: "/page:num/"
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-paginate
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
