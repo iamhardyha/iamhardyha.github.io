@@ -27,9 +27,9 @@
   color: inherit;
 }
 
-/* 썸네일 */
+/* 썸네일: 2:1 비율 유지 */
 .kakao-post-thumb {
-  height: 160px;
+  aspect-ratio: 2 / 1;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -104,12 +104,12 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  .kakao-post-thumb { height: 180px; }
+  .kakao-post-thumb { aspect-ratio: 2 / 1; }
   .kakao-post-body { padding: 1.5rem; }
 }
 
 @media (max-width: 480px) {
-  .kakao-post-thumb { height: 160px; }
+  .kakao-post-thumb { aspect-ratio: 2 / 1; }
   .kakao-post-title { font-size: 1.15rem; }
 }
 
