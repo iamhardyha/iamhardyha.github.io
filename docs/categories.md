@@ -7,81 +7,76 @@ permalink: /categories/
 <div class="kakao-categories-page">
   {% assign category_list = "Backend,Frontend,Infra,CS" | split: "," %}
 
-  <div class="kakao-category-tabs">
-    <a href="javascript:void(0)" class="kakao-category-tab active" onclick="filterCategory('all', this)">All</a>
+  <div class="cat-pills">
     {% for cat in category_list %}
-    <a href="javascript:void(0)" class="kakao-category-tab" onclick="filterCategory('{{ cat | downcase }}', this)">{{ cat }}</a>
-    {% endfor %}
-  </div>
-
-  <div class="kakao-post-list" id="category-post-list">
-    {% for post in site.posts %}
-    <div class="kakao-post-card" data-category="{{ post.categories | first | downcase }}">
-      <div class="kakao-post-thumb">
-        {% if post.thumbnail %}
-          <a href="{{ post.url | relative_url }}">
-            <img src="{{ post.thumbnail }}" alt="{{ post.title }}">
-          </a>
-        {% else %}
-          <a href="{{ post.url | relative_url }}">
-            <div class="thumb-placeholder">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-            </div>
-          </a>
+      {% assign cat_lower = cat | downcase %}
+      {% assign post_count = 0 %}
+      {% for post in site.posts %}
+        {% assign post_cat = post.categories | first | downcase %}
+        {% if post_cat == cat_lower %}
+          {% assign post_count = post_count | plus: 1 %}
         {% endif %}
-      </div>
-      <div class="kakao-post-body">
-        <div class="kakao-post-category">{{ post.categories | first | upcase }}</div>
-        <h2 class="kakao-post-title">
-          <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-        </h2>
-        <p class="kakao-post-excerpt">
-          {{ post.excerpt | strip_html | truncate: 150 }}
-        </p>
-        <div class="kakao-post-meta">
-          <span class="kakao-post-date">{{ post.date | date: "%Y.%m.%d" }}</span>
-          {% if post.tags.size > 0 %}
-          <div class="kakao-post-tags">
-            {% for tag in post.tags %}
-            <span class="kakao-tag-inline">{{ tag }}</span>
-            {% endfor %}
+      {% endfor %}
+      <div class="cat-pill {% if post_count == 0 %}cat-pill--disabled{% endif %}" {% if post_count > 0 %}onclick="toggleCategory('cat-{{ cat_lower }}')"{% endif %}>
+        <div class="cat-pill-header">
+          <div class="cat-pill-info">
+            <span class="cat-pill-name">{{ cat }}</span>
+            <span class="cat-pill-count">{{ post_count }}</span>
           </div>
+          {% if post_count > 0 %}
+          <span class="cat-pill-arrow" id="arrow-cat-{{ cat_lower }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </span>
           {% endif %}
         </div>
       </div>
-    </div>
-    {% endfor %}
-  </div>
 
-  <div class="kakao-no-posts" id="category-no-posts" style="display:none;">
-    해당 카테고리의 포스트가 없습니다.
+      {% if post_count > 0 %}
+      <div class="cat-dropdown" id="cat-{{ cat_lower }}">
+        {% assign shown = 0 %}
+        {% for post in site.posts %}
+          {% assign post_cat = post.categories | first | downcase %}
+          {% if post_cat == cat_lower and shown < 5 %}
+          <a href="{{ post.url | relative_url }}" class="cat-dropdown-item">
+            <div class="cat-dropdown-item-left">
+              <span class="cat-dropdown-title">{{ post.title }}</span>
+              <span class="cat-dropdown-excerpt">{{ post.excerpt | strip_html | truncate: 80 }}</span>
+            </div>
+            <span class="cat-dropdown-date">{{ post.date | date: "%Y.%m.%d" }}</span>
+          </a>
+          {% assign shown = shown | plus: 1 %}
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endfor %}
   </div>
 </div>
 
 <script>
-function filterCategory(cat, el) {
-  document.querySelectorAll('.kakao-category-tab').forEach(function(t) {
-    t.classList.remove('active');
-  });
-  if (el) el.classList.add('active');
+function toggleCategory(id) {
+  var dropdown = document.getElementById(id);
+  var arrow = document.getElementById('arrow-' + id);
+  var isOpen = dropdown.classList.contains('open');
 
-  var cards = document.querySelectorAll('#category-post-list .kakao-post-card');
-  var visibleCount = 0;
-  cards.forEach(function(card) {
-    if (cat === 'all' || card.getAttribute('data-category') === cat) {
-      card.style.display = 'flex';
-      visibleCount++;
-    } else {
-      card.style.display = 'none';
-    }
+  // Close all
+  document.querySelectorAll('.cat-dropdown').forEach(function(d) {
+    d.classList.remove('open');
+  });
+  document.querySelectorAll('.cat-pill-arrow').forEach(function(a) {
+    a.classList.remove('rotated');
+  });
+  document.querySelectorAll('.cat-pill').forEach(function(p) {
+    p.classList.remove('cat-pill--active');
   });
 
-  document.getElementById('category-no-posts').style.display = visibleCount === 0 ? 'block' : 'none';
+  // Toggle clicked
+  if (!isOpen) {
+    dropdown.classList.add('open');
+    if (arrow) arrow.classList.add('rotated');
+    dropdown.previousElementSibling.classList.add('cat-pill--active');
+  }
 }
 </script>
