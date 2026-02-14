@@ -75,34 +75,64 @@ layout: page
 </div>
 
 <script>
-function filterByTag(tag, el) {
-  // Update active tag
-  document.querySelectorAll('.kakao-tags-cloud .kakao-tag').forEach(function(t) {
-    t.classList.remove('active');
-  });
-  if (el) el.classList.add('active');
+  function filterByTag(tag, el) {
+    // 기존 필터링 코드
+    document.querySelectorAll('.kakao-tags-cloud .kakao-tag').forEach(function(t) {
+      t.classList.remove('active');
+    });
+    if (el) el.classList.add('active');
 
-  // Filter posts
-  var cards = document.querySelectorAll('.kakao-post-card');
-  var visibleCount = 0;
-  cards.forEach(function(card) {
-    if (tag === 'all') {
-      card.style.display = 'flex';
-      visibleCount++;
-    } else {
-      var tags = card.getAttribute('data-tags').split(',');
-      if (tags.indexOf(tag) !== -1) {
+    var cards = document.querySelectorAll('.kakao-post-card');
+    var visibleCount = 0;
+    cards.forEach(function(card) {
+      if (tag === 'all') {
         card.style.display = 'flex';
         visibleCount++;
       } else {
-        card.style.display = 'none';
+        var tags = card.getAttribute('data-tags').split(',');
+        if (tags.indexOf(tag) !== -1) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
       }
+    });
+
+    document.getElementById('kakao-no-posts').style.display = visibleCount === 0 ? 'block' : 'none';
+
+    // 🔥 새 기능: 포스트 개수에 따라 레이아웃 자동 변경
+    adjustLayout(visibleCount);
+
+    document.querySelector('.kakao-post-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // 포스트 개수별 레이아웃 조정
+  function adjustLayout(count) {
+    const grid = document.querySelector('.kakao-post-list');
+
+    if (count === 0) {
+      grid.style.gridTemplateColumns = '1fr';
+      return;
     }
+
+    if (count === 1 || count === 2) {
+      // 1-2개: 가로 1줄 (세로 아님!)
+      grid.style.gridTemplateColumns = `repeat(${count}, minmax(350px, 380px))`;
+      grid.style.justifyContent = 'center';
+      grid.style.gap = '3rem';
+    } else {
+      // 3개 이상: 기본 3열 그리드
+      grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(360px, 1fr))';
+      grid.style.justifyContent = 'center';
+      grid.style.gap = '2rem';
+    }
+  }
+
+  // 초기 로드시 레이아웃 설정
+  document.addEventListener('DOMContentLoaded', function() {
+    const totalPosts = document.querySelectorAll('.kakao-post-card').length;
+    adjustLayout(totalPosts);
   });
-
-  document.getElementById('kakao-no-posts').style.display = visibleCount === 0 ? 'block' : 'none';
-
-  // Smooth scroll to posts
-  document.querySelector('.kakao-post-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
 </script>
+

@@ -1,77 +1,135 @@
-/* 카카오 테크 블로그 스타일 - Beautiful Jekyll 호환 */
-.kakao-home { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-
-.kakao-section { margin-bottom: 4rem; }
-.kakao-section-title {
-  font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;
-  color: #1a1a1a; border-bottom: 3px solid #3182ce; padding-bottom: 0.5rem;
-  max-width: max-content;
+/* === 깨짐 해결! 3열 우선 + 안전한 반응형 === */
+.kakao-post-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* 380px로 줄여서 3열 보장 */
+  gap: 2rem;
+  max-width: 1300px; margin: 0 auto 3rem;
+  justify-items: center; /* 중앙 정렬 */
 }
 
-.kakao-tags-cloud {
-  display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-bottom: 2rem;
+/* 카드 고정 높이로 균일하게 */
+.kakao-post-card {
+  width: 100%; max-width: 400px; /* 최대 400px 제한 */
+  min-height: 480px; /* 고정 최소 높이 */
+  display: flex; flex-direction: column;
 }
-.kakao-tag {
-  padding: 0.5rem 1.25rem; background: #f7fafc; color: #4a5568;
-  border: 1px solid #e2e8f0; border-radius: 25px; text-decoration: none;
-  font-weight: 500; font-size: 0.9rem; transition: all 0.2s; cursor: pointer;
+
+/* 썸네일 고정 비율 */
+.kakao-post-thumb {
+  height: 200px; /* 200px 고정 */
+  flex-shrink: 0; /* 축소 안됨 */
+}
+
+/* 바디 내용 균등 분배 */
+.kakao-post-body {
+  flex: 1; display: flex; flex-direction: column;
+  padding: 1.75rem; min-height: 260px;
+}
+
+/* 제목 고정 공간 */
+.kakao-post-title {
+  font-size: 1.25rem; line-height: 1.35;
+  margin-bottom: 1rem; min-height: 3.4rem; /* 2줄 고정 */
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* 미리보기 2줄 고정 */
+.kakao-post-excerpt {
+  font-size: 0.95rem; line-height: 1.55;
+  margin-bottom: 1.25rem; min-height: 3.1rem; /* 2줄 */
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* 나머지 스타일 유지 (간략화) */
+.kakao-post-category {
+  color: #ec4899; font-size: 0.75rem; font-weight: 700;
+  padding: 0.3rem 0.8rem; border-radius: 16px;
+  background: rgba(236, 72, 153, 0.12); margin-bottom: 0.75rem;
+  align-self: flex-start;
+}
+
+.kakao-post-meta {
+  margin-top: auto; padding-top: 1rem; border-top: 1px solid #f3f4f6;
+  font-size: 0.88rem; color: #6b7280; display: flex;
+  justify-content: space-between; align-items: center;
+}
+
+/* 태그 클라우드 간격 조정 */
+.kakao-tags-cloud { gap: 0.75rem; }
+
+/* 모바일에서만 1열 강제 */
+@media (max-width: 1023px) {
+  .kakao-post-list {
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .kakao-post-list {
+    grid-template-columns: 1fr; /* 모바일 1열 확정 */
+    gap: 1.75rem; max-width: 100%;
+  }
+  .kakao-post-thumb { height: 180px; }
+  .kakao-post-body { padding: 1.5rem; }
+}
+
+/* 초소형 화면 */
+@media (max-width: 480px) {
+  .kakao-post-thumb { height: 160px; }
+  .kakao-post-title { font-size: 1.15rem; }
+}
+
+/* === 태그 클라우드 스타일 복구 (최고 우선순위) === */
+.kakao-tags-cloud .kakao-tag {
+  display: inline-flex !important;
+  align-items: center;
+  padding: 0.7rem 1.8rem !important;
+  background: linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.15)) !important;
+  color: #5b21b6 !important;
+  border: 2px solid rgba(102,126,234,0.3) !important;
+  border-radius: 50px !important;
+  font-weight: 700 !important;
+  font-size: 0.92rem !important;
+  text-decoration: none !important;
+  margin: 0.25rem !important;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+  box-shadow: 0 4px 14px rgba(102,126,234,0.2) !important;
   white-space: nowrap;
 }
-.kakao-tag:hover, .kakao-tag.active {
-  background: #3182ce !important; color: white !important; border-color: #3182ce; transform: translateY(-1px); }
-.kakao-tag-count { font-size: 0.8rem; opacity: 0.8; margin-left: 0.25rem; }
 
-.kakao-post-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 2rem; }
-.kakao-post-card {
-  display: flex; background: white; border-radius: 16px; overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #f1f5f9;
-  transition: all 0.3s ease; cursor: pointer;
-}
-.kakao-post-card:hover {
-  transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); border-color: #3182ce; }
-
-.kakao-post-thumb {
-  min-width: 160px; height: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
-}
-.kakao-post-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
-.kakao-post-card:hover .kakao-post-thumb img { transform: scale(1.05); }
-.thumb-placeholder { color: white; font-weight: 600; svg { stroke: rgba(255,255,255,0.8); } }
-
-.kakao-post-body { flex: 1; padding: 1.5rem; }
-.kakao-post-category {
-  color: #3182ce; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.05em; margin-bottom: 0.5rem;
-}
-.kakao-post-title {
-  font-size: 1.2rem; font-weight: 700; line-height: 1.4; margin: 0 0 0.75rem 0;
-}
-.kakao-post-title a { color: #1a202c; text-decoration: none; }
-.kakao-post-title a:hover { color: #3182ce; }
-.kakao-post-excerpt {
-  color: #64748b; line-height: 1.6; margin-bottom: 1rem; font-size: 0.95rem;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+.kakao-tags-cloud .kakao-tag:hover,
+.kakao-tags-cloud .kakao-tag.active {
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  color: white !important;
+  border-color: transparent !important;
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow: 0 12px 32px rgba(102,126,234,0.4) !important;
 }
 
-.kakao-post-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #94a3b8; }
-.kakao-post-date::before { content: '📅 '; }
-.kakao-post-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.kakao-tag-inline {
-  background: #e2e8f0; color: #475569; padding: 0.2rem 0.75rem;
-  border-radius: 12px; font-size: 0.75rem; text-decoration: none; font-weight: 500;
-  transition: all 0.2s;
-}
-.kakao-tag-inline:hover { background: #3182ce; color: white; }
-
-.kakao-no-posts {
-  text-align: center; padding: 4rem 2rem; color: #94a3b8;
-  font-size: 1.1rem; background: #f8fafc; border-radius: 12px; border: 2px dashed #cbd5e1;
+.kakao-tags-cloud .kakao-tag-count {
+  font-size: 0.82rem !important;
+  margin-left: 0.6rem !important;
+  opacity: 0.95 !important;
+  font-weight: 600 !important;
 }
 
-/* 모바일 반응형 */
-@media (max-width: 768px) {
-  .kakao-post-list { grid-template-columns: 1fr; gap: 1.5rem; }
-  .kakao-tags-cloud { justify-content: flex-start; overflow-x: auto; padding-bottom: 1rem; }
-  .kakao-post-card { flex-direction: column; }
-  .kakao-post-thumb { min-width: auto; height: 200px; }
+/* 태그 컨테이너 중앙 배치 */
+.kakao-tags-cloud {
+  justify-content: center !important;
+  gap: 0.8rem !important;
+  flex-wrap: wrap !important;
+  padding: 1.5rem 0 !important;
+}
+
+/* 섹션 제목 복구 */
+.kakao-section-title {
+  font-size: 1.875rem !important;
+  font-weight: 800 !important;
+  margin-bottom: 2.25rem !important;
+  background: linear-gradient(135deg, #667eea, #764ba2) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
 }
