@@ -5,8 +5,9 @@ layout: default
 <div class="home">
   {{ content }}
 
+  {% assign posts = paginator.posts | default: site.posts %}
   <ul class="post-list">
-    {% for post in paginator.posts %}
+    {% for post in posts %}
     <li class="post-item">
       <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">
         {{ post.date | date: "%Y-%m-%d" }}
