@@ -9,15 +9,39 @@
 
 /* 카드 고정 높이로 균일하게 */
 .kakao-post-card {
-  width: 100%; max-width: 400px; /* 최대 400px 제한 */
-  min-height: 480px; /* 고정 최소 높이 */
+  width: 100%; max-width: 400px;
+  min-height: 480px;
   display: flex; flex-direction: column;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.kakao-post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+.kakao-post-card a {
+  text-decoration: none;
+  color: inherit;
 }
 
 /* 썸네일 고정 비율 */
 .kakao-post-thumb {
-  height: 200px; /* 200px 고정 */
-  flex-shrink: 0; /* 축소 안됨 */
+  height: 200px;
+  flex-shrink: 0;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.kakao-post-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* 바디 내용 균등 분배 */
