@@ -1,0 +1,41 @@
+---
+layout: page
+---
+
+{{ content }}
+
+<div class="kakao-post-list">
+  {% for post in site.posts %}
+  <div class="kakao-post-card">
+    <div class="kakao-post-thumb">
+      {% if post.thumbnail %}
+        <a href="{{ post.url | relative_url }}">
+          <img src="{{ post.thumbnail }}" alt="{{ post.title }}">
+        </a>
+      {% else %}
+        <a href="{{ post.url | relative_url }}">
+          <div class="thumb-placeholder">&#128196;</div>
+        </a>
+      {% endif %}
+    </div>
+    <div class="kakao-post-body">
+      <h2 class="kakao-post-title">
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </h2>
+      <p class="kakao-post-excerpt">
+        {{ post.excerpt | strip_html | truncate: 150 }}
+      </p>
+      <div class="kakao-post-meta">
+        <span class="kakao-post-date">{{ post.date | date: "%Y.%m.%d" }}</span>
+        {% if post.tags.size > 0 %}
+        <div class="kakao-post-tags">
+          {% for tag in post.tags %}
+          <a href="{{ '/tags/' | relative_url }}#{{ tag }}" class="kakao-tag">{{ tag }}</a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
