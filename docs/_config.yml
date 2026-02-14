@@ -1,7 +1,15 @@
+remote_theme: daattali/beautiful-jekyll
+
 title: iamhardyha
 description: Tech blog about software engineering
 url: "https://iamhardyha.github.io"
 baseurl: ""
+
+navbar-links:
+  Home: ""
+  Categories: "categories"
+  Tags: "tags"
+  About: "about"
 
 markdown: kramdown
 kramdown:
@@ -13,10 +21,14 @@ permalink: /:categories/:year/:month/:day/:title/
 paginate: 10
 paginate_path: "/page:num/"
 
+post_search: true
+
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
   - jekyll-paginate
+  - jekyll-remote-theme
+  - jekyll-sitemap
 
 exclude:
   - Gemfile
