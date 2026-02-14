@@ -1,16 +1,15 @@
-/* === 깨짐 해결! 3열 우선 + 안전한 반응형 === */
+/* === 3열 그리드 === */
 .kakao-post-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); /* 380px로 줄여서 3열 보장 */
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
-  max-width: 1300px; margin: 0 auto 3rem;
-  justify-items: center; /* 중앙 정렬 */
+  max-width: 1300px;
+  margin: 0 auto 3rem;
 }
 
-/* 카드 고정 높이로 균일하게 */
+/* 카드 스타일 */
 .kakao-post-card {
-  width: 100%; max-width: 400px;
-  min-height: 480px;
+  width: 100%;
   display: flex; flex-direction: column;
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -83,26 +82,107 @@
 /* 태그 클라우드 간격 조정 */
 .kakao-tags-cloud { gap: 0.75rem; }
 
-/* 모바일에서만 1열 강제 */
+/* 태블릿: 2열 */
 @media (max-width: 1023px) {
   .kakao-post-list {
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* 모바일: 1열 */
 @media (max-width: 768px) {
   .kakao-post-list {
-    grid-template-columns: 1fr; /* 모바일 1열 확정 */
-    gap: 1.75rem; max-width: 100%;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   .kakao-post-thumb { height: 180px; }
   .kakao-post-body { padding: 1.5rem; }
 }
 
-/* 초소형 화면 */
 @media (max-width: 480px) {
   .kakao-post-thumb { height: 160px; }
   .kakao-post-title { font-size: 1.15rem; }
+}
+
+/* === Pagination === */
+.kakao-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 3rem;
+  padding: 2rem 0;
+}
+
+.kakao-pagination .page-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f46e5;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.kakao-pagination .page-btn:hover {
+  background: #f8f7ff;
+  border-color: #4f46e5;
+  text-decoration: none;
+  color: #4f46e5;
+}
+.kakao-pagination .page-btn.disabled {
+  color: #cbd5e1;
+  cursor: default;
+  pointer-events: none;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 4px;
+}
+
+.page-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.page-num:hover {
+  border-color: #4f46e5;
+  color: #4f46e5;
+  text-decoration: none;
+}
+.page-num.active {
+  background: #4f46e5;
+  color: #fff;
+  border-color: #4f46e5;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .kakao-pagination .page-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .page-num {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
 }
 
 /* === 태그 클라우드 스타일 복구 (최고 우선순위) === */

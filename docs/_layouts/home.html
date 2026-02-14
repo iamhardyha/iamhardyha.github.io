@@ -25,7 +25,8 @@ layout: page
   <section class="kakao-section">
     <h2 class="kakao-section-title">Posts</h2>
     <div class="kakao-post-list" id="kakao-post-list">
-      {% for post in site.posts %}
+      {% assign posts = paginator.posts | default: site.posts %}
+      {% for post in posts %}
       <div class="kakao-post-card" data-tags="{{ post.tags | join: ',' }}">
         <div class="kakao-post-thumb">
           {% if post.thumbnail %}
@@ -71,12 +72,52 @@ layout: page
     <div class="kakao-no-posts" id="kakao-no-posts" style="display:none;">
       해당 태그의 포스트가 없습니다.
     </div>
+
+    <!-- Pagination -->
+    {% if paginator.total_pages > 1 %}
+    <nav class="kakao-pagination">
+      {% if paginator.previous_page %}
+        <a href="{{ paginator.previous_page_path | relative_url }}" class="page-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          이전
+        </a>
+      {% else %}
+        <span class="page-btn disabled">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          이전
+        </span>
+      {% endif %}
+
+      <div class="page-numbers">
+        {% for page in (1..paginator.total_pages) %}
+          {% if page == paginator.page %}
+            <span class="page-num active">{{ page }}</span>
+          {% elsif page == 1 %}
+            <a href="{{ '/' | relative_url }}" class="page-num">{{ page }}</a>
+          {% else %}
+            <a href="{{ site.paginate_path | relative_url | replace: ':num', page }}" class="page-num">{{ page }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if paginator.next_page %}
+        <a href="{{ paginator.next_page_path | relative_url }}" class="page-btn">
+          다음
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </a>
+      {% else %}
+        <span class="page-btn disabled">
+          다음
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </span>
+      {% endif %}
+    </nav>
+    {% endif %}
   </section>
 </div>
 
 <script>
   function filterByTag(tag, el) {
-    // 기존 필터링 코드
     document.querySelectorAll('.kakao-tags-cloud .kakao-tag').forEach(function(t) {
       t.classList.remove('active');
     });
@@ -100,39 +141,5 @@ layout: page
     });
 
     document.getElementById('kakao-no-posts').style.display = visibleCount === 0 ? 'block' : 'none';
-
-    // 🔥 새 기능: 포스트 개수에 따라 레이아웃 자동 변경
-    adjustLayout(visibleCount);
-
-    document.querySelector('.kakao-post-list').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-
-  // 포스트 개수별 레이아웃 조정
-  function adjustLayout(count) {
-    const grid = document.querySelector('.kakao-post-list');
-
-    if (count === 0) {
-      grid.style.gridTemplateColumns = '1fr';
-      return;
-    }
-
-    if (count === 1 || count === 2) {
-      // 1-2개: 가로 1줄 (세로 아님!)
-      grid.style.gridTemplateColumns = `repeat(${count}, minmax(350px, 380px))`;
-      grid.style.justifyContent = 'center';
-      grid.style.gap = '3rem';
-    } else {
-      // 3개 이상: 기본 3열 그리드
-      grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(360px, 1fr))';
-      grid.style.justifyContent = 'center';
-      grid.style.gap = '2rem';
-    }
-  }
-
-  // 초기 로드시 레이아웃 설정
-  document.addEventListener('DOMContentLoaded', function() {
-    const totalPosts = document.querySelectorAll('.kakao-post-card').length;
-    adjustLayout(totalPosts);
-  });
 </script>
-
