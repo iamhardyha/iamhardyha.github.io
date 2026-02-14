@@ -4,79 +4,116 @@ title: Categories
 permalink: /categories/
 ---
 
+<link rel="stylesheet" href="{{ '/assets/css/categories.css' | relative_url }}">
+
 <div class="kakao-categories-page">
   {% assign category_list = "Backend,Frontend,Infra,CS" | split: "," %}
 
-  <div class="cat-pills">
+  <div class="categories-container">
     {% for cat in category_list %}
-      {% assign cat_lower = cat | downcase %}
-      {% assign post_count = 0 %}
-      {% for post in site.posts %}
-        {% assign post_cat = post.categories | first | downcase %}
-        {% if post_cat == cat_lower %}
-          {% assign post_count = post_count | plus: 1 %}
-        {% endif %}
-      {% endfor %}
-      <div class="cat-pill {% if post_count == 0 %}cat-pill--disabled{% endif %}" {% if post_count > 0 %}onclick="toggleCategory('cat-{{ cat_lower }}')"{% endif %}>
-        <div class="cat-pill-header">
-          <div class="cat-pill-info">
-            <span class="cat-pill-name">{{ cat }}</span>
-            <span class="cat-pill-count">{{ post_count }}</span>
-          </div>
-          {% if post_count > 0 %}
-          <span class="cat-pill-arrow" id="arrow-cat-{{ cat_lower }}">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+    {% assign cat_lower = cat | downcase %}
+    {% assign post_count = 0 %}
+    {% for post in site.posts %}
+    {% assign post_cat = post.categories | first | downcase %}
+    {% if post_cat == cat_lower %}
+    {% assign post_count = post_count | plus: 1 %}
+    {% endif %}
+    {% endfor %}
+
+    <div class="category-section">
+      <div class="cat-header {{ cat_lower }} js-toggle-category" data-category="{{ cat_lower }}">
+          <span class="cat-emoji">
+            {% case cat %}
+              {% when 'Backend' %} 💻
+              {% when 'Frontend' %} 🎨
+              {% when 'Infra' %} ⚙️
+              {% when 'CS' %} 🧠
+            {% endcase %}
           </span>
-          {% endif %}
+        <div class="cat-info">
+          <div class="cat-name">{{ cat }}</div>
+          <div class="cat-count">{{ post_count }}개 포스트</div>
         </div>
       </div>
 
-      {% if post_count > 0 %}
-      <div class="cat-dropdown" id="cat-{{ cat_lower }}">
-        {% assign shown = 0 %}
-        {% for post in site.posts %}
-          {% assign post_cat = post.categories | first | downcase %}
-          {% if post_cat == cat_lower and shown < 5 %}
-          <a href="{{ post.url | relative_url }}" class="cat-dropdown-item">
-            <div class="cat-dropdown-item-left">
-              <span class="cat-dropdown-title">{{ post.title }}</span>
-              <span class="cat-dropdown-excerpt">{{ post.excerpt | strip_html | truncate: 80 }}</span>
-            </div>
-            <span class="cat-dropdown-date">{{ post.date | date: "%Y.%m.%d" }}</span>
-          </a>
-          {% assign shown = shown | plus: 1 %}
-          {% endif %}
-        {% endfor %}
+      <div class="dropdown-content" id="dropdown-{{ cat_lower }}">
+        <div class="posts-grid" id="posts-{{ cat_lower }}"></div>
+        <div class="pagination-container" id="pagination-{{ cat_lower }}"></div>
       </div>
-      {% endif %}
+    </div>
     {% endfor %}
   </div>
 </div>
 
 <script>
-function toggleCategory(id) {
-  var dropdown = document.getElementById(id);
-  var arrow = document.getElementById('arrow-' + id);
-  var isOpen = dropdown.classList.contains('open');
+  window.sitePosts = {{ site.posts | jsonify | escape }};
 
-  // Close all
-  document.querySelectorAll('.cat-dropdown').forEach(function(d) {
-    d.classList.remove('open');
-  });
-  document.querySelectorAll('.cat-pill-arrow').forEach(function(a) {
-    a.classList.remove('rotated');
-  });
-  document.querySelectorAll('.cat-pill').forEach(function(p) {
-    p.classList.remove('cat-pill--active');
+  const POSTS_PER_PAGE = 5;
+  const pages = {};
+
+  document.querySelectorAll('.js-toggle-category').forEach(header => {
+    header.addEventListener('click', () => {
+      const cat = header.dataset.category;
+      const dropdown = document.getElementById(`dropdown-${cat}`);
+      const isOpen = dropdown.classList.contains('open');
+
+      // 모든 드롭다운 닫기
+      document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('open'));
+
+      // 토글
+      if (!isOpen) {
+        dropdown.classList.add('open');
+        pages[cat] = pages[cat] || 1;
+        loadPostsForCategory(cat, pages[cat]);
+      }
+    });
   });
 
-  // Toggle clicked
-  if (!isOpen) {
-    dropdown.classList.add('open');
-    if (arrow) arrow.classList.add('rotated');
-    dropdown.previousElementSibling.classList.add('cat-pill--active');
+  function loadPostsForCategory(cat, page = 1) {
+    const categoryPosts = window.sitePosts
+      .filter(post => {
+        const postCats = post.categories || [];
+        return postCats.some(postCat => postCat.toString().toLowerCase() === cat);
+      })
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    const container = document.getElementById(`posts-${cat}`);
+    const pagination = document.getElementById(`pagination-${cat}`);
+
+    if (categoryPosts.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📝</div>
+          <h3>아직 작성된 글이 없습니다</h3>
+          <p>이 카테고리에 속한 글이 없어요.</p>
+        </div>
+      `;
+      pagination.innerHTML = '';
+    } else {
+      const start = (page - 1) * POSTS_PER_PAGE;
+      const paginatedPosts = categoryPosts.slice(start, start + POSTS_PER_PAGE).map(post => ({
+        title: post.title || '제목 없음',
+        excerpt: (post.excerpt || '').replace(/<[^>]*>/g, '').substring(0, 100) + '...',
+        date: new Date(post.date).toLocaleDateString('ko-KR', {year:'numeric', month:'2-digit', day:'2-digit'}),
+        url: post.url
+      }));
+
+      container.innerHTML = paginatedPosts.map(post => `
+        <a href="${post.url}" class="post-card">
+          <h3 class="post-title">${post.title}</h3>
+          <p class="post-excerpt">${post.excerpt}</p>
+          <span class="post-date">${post.date}</span>
+        </a>
+      `).join('');
+
+      const totalPages = Math.ceil(categoryPosts.length / POSTS_PER_PAGE);
+      pages[cat] = page;
+
+      pagination.innerHTML = `
+        <button class="page-btn" ${page === 1 ? 'disabled' : ''} onclick="loadPostsForCategory('${cat}', ${page-1})">← 이전</button>
+        <span class="page-info">${page} / ${totalPages}</span>
+        <button class="page-btn" ${page === totalPages ? 'disabled' : ''} onclick="loadPostsForCategory('${cat}', ${page+1})">다음 →</button>
+      `;
+    }
   }
-}
 </script>
