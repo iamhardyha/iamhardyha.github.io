@@ -18,7 +18,6 @@ social-network-links:
 navbar-links:
   Home: ""
   Categories: "categories"
-  Tags: "tags"
   About: "about"
 
 navbar-col: "#ffffff"

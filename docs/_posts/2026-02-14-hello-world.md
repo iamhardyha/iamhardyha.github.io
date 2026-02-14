@@ -2,7 +2,7 @@
 layout: post
 title: "Hello World - 블로그를 시작합니다"
 date: 2026-02-14
-categories: [general]
+categories: [backend]
 tags: [blog, jekyll]
 ---
 
