@@ -27,56 +27,65 @@
   color: inherit;
 }
 
-/* 썸네일 고정 비율 */
+/* 썸네일 */
 .kakao-post-thumb {
-  height: 200px;
+  height: 160px;
   flex-shrink: 0;
-  background: #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
+}
+.kakao-post-thumb a {
+  display: block;
+  height: 100%;
 }
 .kakao-post-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+.kakao-post-thumb .thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-/* 바디 내용 균등 분배 */
+/* 바디 */
 .kakao-post-body {
-  flex: 1; display: flex; flex-direction: column;
-  padding: 1.75rem; min-height: 260px;
+  display: flex; flex-direction: column;
+  padding: 1rem 1.25rem 1.25rem;
 }
 
-/* 제목 고정 공간 */
-.kakao-post-title {
-  font-size: 1.25rem; line-height: 1.35;
-  margin-bottom: 1rem; min-height: 3.4rem; /* 2줄 고정 */
-  display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
-
-/* 미리보기 2줄 고정 */
-.kakao-post-excerpt {
-  font-size: 0.95rem; line-height: 1.55;
-  margin-bottom: 1.25rem; min-height: 3.1rem; /* 2줄 */
-  display: -webkit-box; -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; overflow: hidden;
-}
-
-/* 나머지 스타일 유지 (간략화) */
+/* 카테고리 뱃지 */
 .kakao-post-category {
-  color: #ec4899; font-size: 0.75rem; font-weight: 700;
-  padding: 0.3rem 0.8rem; border-radius: 16px;
-  background: rgba(236, 72, 153, 0.12); margin-bottom: 0.75rem;
+  color: #ec4899; font-size: 0.7rem; font-weight: 700;
+  padding: 0.2rem 0.6rem; border-radius: 12px;
+  background: rgba(236, 72, 153, 0.1); margin-bottom: 0.5rem;
   align-self: flex-start;
 }
 
+/* 제목 2줄 */
+.kakao-post-title {
+  font-size: 1rem; line-height: 1.4;
+  margin: 0 0 0.5rem 0;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* 발췌 2줄 */
+.kakao-post-excerpt {
+  font-size: 0.85rem; line-height: 1.5;
+  color: #64748b;
+  margin: 0 0 0.75rem 0;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* 메타 (날짜) */
 .kakao-post-meta {
-  margin-top: auto; padding-top: 1rem; border-top: 1px solid #f3f4f6;
-  font-size: 0.88rem; color: #6b7280; display: flex;
-  justify-content: space-between; align-items: center;
+  margin-top: auto; padding-top: 0.75rem; border-top: 1px solid #f3f4f6;
+  font-size: 0.8rem; color: #94a3b8;
 }
 
 /* 태그 클라우드 간격 조정 */
