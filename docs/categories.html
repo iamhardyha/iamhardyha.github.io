@@ -46,21 +46,19 @@ permalink: /categories/
 </div>
 
 <script>
-  window.sitePosts = {{ site.posts | jsonify }};
+  window.sitePosts = {{ site.posts | jsonify | escape }};
 
   const POSTS_PER_PAGE = 5;
   const pages = {};
 
   document.querySelectorAll('.js-toggle-category').forEach(header => {
-    header.addEventListener('click', () => {
-      const cat = header.dataset.category;
+    header.addEventListener('click', function() {
+      const cat = this.dataset.category;
       const dropdown = document.getElementById(`dropdown-${cat}`);
       const isOpen = dropdown.classList.contains('open');
 
-      // 모든 드롭다운 닫기
       document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('open'));
 
-      // 토글
       if (!isOpen) {
         dropdown.classList.add('open');
         pages[cat] = pages[cat] || 1;
@@ -84,35 +82,50 @@ permalink: /categories/
       container.innerHTML = `
         <div class="empty-state">
           <div class="empty-icon">📝</div>
-          <h3>아직 작성된 글이 없습니다</h3>
-          <p>이 카테고리에 속한 글이 없어요.</p>
+          <h3 class="empty-title">아직 글이 없습니다</h3>
+          <p class="empty-text">첫 번째 포스트를 작성해보세요!</p>
         </div>
       `;
       pagination.innerHTML = '';
     } else {
       const start = (page - 1) * POSTS_PER_PAGE;
-      const paginatedPosts = categoryPosts.slice(start, start + POSTS_PER_PAGE).map(post => ({
-        title: post.title || '제목 없음',
-        excerpt: (post.excerpt || '').replace(/<[^>]*>/g, '').substring(0, 100) + '...',
-        date: new Date(post.date).toLocaleDateString('ko-KR', {year:'numeric', month:'2-digit', day:'2-digit'}),
-        url: post.url
-      }));
+      const paginatedPosts = categoryPosts.slice(start, start + POSTS_PER_PAGE);
 
-      container.innerHTML = paginatedPosts.map(post => `
-        <a href="${post.url}" class="post-card">
-          <h3 class="post-title">${post.title}</h3>
-          <p class="post-excerpt">${post.excerpt}</p>
-          <span class="post-date">${post.date}</span>
-        </a>
-      `).join('');
+      container.innerHTML = `
+        <div class="posts-list">
+          ${paginatedPosts.map(post => `
+            <a href="${post.url}" class="post-item">
+              <div class="post-thumbnail">${post.title.charAt(0).toUpperCase()}</div>
+              <div class="post-content">
+                <h3 class="post-title">${post.title || '제목 없음'}</h3>
+                <div class="post-meta">
+                  <span class="post-date">
+                    ${new Date(post.date).toLocaleDateString('ko-KR', {year:'numeric', month:'2-digit', day:'2-digit'})}
+                  </span>
+                  <div class="post-tags">
+                    ${post.tags ? post.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
+                  </div>
+                </div>
+                <p class="post-excerpt">
+                  ${(post.excerpt || '').replace(/<[^>]*>/g, '').substring(0, 120)}...
+                </p>
+              </div>
+            </a>
+          `).join('')}
+        </div>
+      `;
 
       const totalPages = Math.ceil(categoryPosts.length / POSTS_PER_PAGE);
       pages[cat] = page;
 
       pagination.innerHTML = `
-        <button class="page-btn" ${page === 1 ? 'disabled' : ''} onclick="loadPostsForCategory('${cat}', ${page-1})">← 이전</button>
+        <button class="page-btn" ${page === 1 ? 'disabled' : ''} onclick="loadPostsForCategory('${cat}', ${page-1})">
+          ← 이전
+        </button>
         <span class="page-info">${page} / ${totalPages}</span>
-        <button class="page-btn" ${page === totalPages ? 'disabled' : ''} onclick="loadPostsForCategory('${cat}', ${page+1})">다음 →</button>
+        <button class="page-btn" ${page === totalPages ? 'disabled' : ''} onclick="loadPostsForCategory('${cat}', ${page+1})">
+          다음 →
+        </button>
       `;
     }
   }
