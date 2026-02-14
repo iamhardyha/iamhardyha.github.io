@@ -46,7 +46,7 @@ permalink: /categories/
 </div>
 
 <script>
-  window.sitePosts = {{ site.posts | jsonify | escape }};
+  window.sitePosts = {{ site.posts | jsonify }};
 
   const POSTS_PER_PAGE = 5;
   const pages = {};
