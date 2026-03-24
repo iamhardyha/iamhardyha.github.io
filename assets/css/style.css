@@ -284,6 +284,120 @@ a {
   line-height: 1.8;
 }
 
+/* ===== Project Card ===== */
+.project-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.project-card__icon--purple {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(167, 139, 250, 0.3));
+}
+
+.project-card__icon--orange {
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.3), rgba(251, 191, 36, 0.3));
+}
+
+.project-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.project-card__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.project-card__desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.project-card__tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.project-card__arrow {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.project-card:hover .project-card__arrow {
+  transform: translateX(4px);
+}
+
+.project-card + .project-card {
+  margin-top: 12px;
+}
+
+/* ===== Badge ===== */
+.badge {
+  font-size: 0.55rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.badge--purple {
+  background: rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  color: var(--purple-light);
+}
+
+.badge--orange {
+  background: rgba(251, 146, 60, 0.15);
+  border: 1px solid rgba(251, 146, 60, 0.25);
+  color: rgba(251, 191, 36, 0.8);
+}
+
+/* ===== Tag ===== */
+.tag {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.6rem;
+}
+
+.tag--purple {
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: rgba(139, 92, 246, 0.8);
+}
+
+.tag--blue {
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: rgba(59, 130, 246, 0.8);
+}
+
 /* ===== Accessibility ===== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
