@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/iamhardyha/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.5/skills/brainstorming/scripts/start-server.sh --project-dir /Users/iamhardyha/dev/iamhardyha.github.io)",
+      "Bash(gh api:*)",
+      "Bash(mkdir -p superpowers-backup)",
+      "Bash(cp -r docs/superpowers superpowers-backup/)",
+      "Bash(git rm:*)",
+      "Bash(mkdir -p docs/superpowers)",
+      "Bash(cp -r superpowers-backup/* docs/superpowers/)",
+      "Bash(rm -rf superpowers-backup)",
+      "Bash(mkdir -p /Users/iamhardyha/dev/iamhardyha.github.io/assets/css /Users/iamhardyha/dev/iamhardyha.github.io/assets/js)",
+      "Bash(touch /Users/iamhardyha/dev/iamhardyha.github.io/assets/css/style.css /Users/iamhardyha/dev/iamhardyha.github.io/assets/js/main.js /Users/iamhardyha/dev/iamhardyha.github.io/.nojekyll)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
