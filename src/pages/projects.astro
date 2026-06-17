@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const projects = [
+  {
+    title: 'Pocket Senior',
+    desc: '출퇴근길에 읽는 백엔드 개발 미니북',
+    href: 'https://iamhardyha.github.io/pocket-senior/',
+    badge: 'PROJECT',
+  },
+  {
+    title: '티스토리 블로그',
+    desc: '기술 블로그 보러가기',
+    href: 'https://devhardy.tistory.com/',
+    badge: 'BLOG',
+  },
+];
+---
+<BaseLayout title="Projects">
+  <div class="container">
+    <h1 class="page-title">Projects</h1>
+    {projects.map((p) => (
+      <a class="proj" href={p.href} target="_blank" rel="noopener">
+        <div>
+          <span class="proj__badge">{p.badge}</span>
+          <h3 class="proj__title">{p.title}</h3>
+          <p class="proj__desc">{p.desc}</p>
+        </div>
+        <span class="proj__arrow">→</span>
+      </a>
+    ))}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-title { font-family: var(--serif); font-size: 2rem; padding: 30px 0 10px; }
+  .proj { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; color: var(--text); }
+  .proj:hover { border-color: var(--accent); }
+  .proj__badge { color: var(--accent); font-size: 0.75rem; letter-spacing: 0.08em; }
+  .proj__title { font-family: var(--serif); margin: 6px 0 4px; }
+  .proj__desc { color: var(--text-muted); margin: 0; }
+  .proj__arrow { font-size: 1.4rem; color: var(--text-muted); }
+</style>
