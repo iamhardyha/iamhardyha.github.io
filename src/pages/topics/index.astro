@@ -1,0 +1,25 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { collectTags } from '../../utils/posts';
+
+const tags = collectTags(await getCollection('posts'));
+---
+<BaseLayout title="Topics">
+  <div class="container">
+    <h1 class="page-title">Topics</h1>
+    <ul class="tag-cloud">
+      {tags.map(({ tag, count }) => (
+        <li><a href={`/topics/${encodeURIComponent(tag)}`}>{tag} <span>{count}</span></a></li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-title { font-family: var(--serif); font-size: 2rem; padding: 30px 0 10px; }
+  .tag-cloud { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+  .tag-cloud a { border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; color: var(--text); }
+  .tag-cloud a:hover { border-color: var(--accent); color: var(--accent); }
+  .tag-cloud span { color: var(--text-muted); font-size: 0.85rem; }
+</style>

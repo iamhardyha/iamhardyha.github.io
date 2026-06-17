@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { publishedSorted, collectTags } from '../../utils/posts';
+
+export const getStaticPaths = (async () => {
+  const all = await getCollection('posts');
+  const tags = collectTags(all);
+  const published = publishedSorted(all);
+  return tags.map(({ tag }) => ({
+    params: { tag },
+    props: { tag, posts: published.filter((p) => p.data.tags.includes(tag)) },
+  }));
+}) satisfies GetStaticPaths;
+
+const { tag, posts } = Astro.props;
+---
+<BaseLayout title={`#${tag}`}>
+  <div class="container">
+    <h1 class="page-title">#{tag}</h1>
+    {posts.map((post) => <PostCard post={post} />)}
+  </div>
+</BaseLayout>
+
+<style>.page-title { font-family: var(--serif); font-size: 2rem; padding: 30px 0 10px; }</style>
