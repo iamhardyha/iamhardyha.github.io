@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="404">
+  <div class="container nf">
+    <h1 class="nf__code">404</h1>
+    <p class="nf__msg">찾으시는 글이 없습니다.</p>
+    <a href="/" class="nf__home">← 홈으로</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .nf { text-align: center; padding: 100px 0; }
+  .nf__code { font-family: var(--serif); font-size: 4rem; margin: 0; }
+  .nf__msg { color: var(--text-muted); }
+  .nf__home { font-weight: 600; }
+</style>
