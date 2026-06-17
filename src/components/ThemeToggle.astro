@@ -20,6 +20,7 @@
     document.documentElement.dataset.theme = theme;
     if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
     localStorage.setItem('theme', theme);
+    window.dispatchEvent(new CustomEvent('themechange', { detail: theme }));
   }
   btn?.addEventListener('click', () => {
     const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';

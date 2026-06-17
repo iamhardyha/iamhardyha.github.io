@@ -8,3 +8,9 @@
 .prose code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .prose :not(pre) > code { background: var(--bg-soft); padding: 2px 5px; border-radius: 4px; font-size: 0.9em; }
 .prose img { max-width: 100%; border-radius: 8px; }
+
+/* Shiki dual-theme: light by default, dark when site theme is dark */
+.prose :is(pre, code) span { color: var(--shiki-light); }
+:root[data-theme="dark"] .prose :is(pre, code) span { color: var(--shiki-dark); }
+.prose pre { background: var(--shiki-light-bg); }
+:root[data-theme="dark"] .prose pre { background: var(--shiki-dark-bg); }

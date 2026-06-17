@@ -20,6 +20,23 @@ const enabled = GISCUS.repoId && GISCUS.categoryId;
       crossorigin="anonymous"
       async
     ></script>
+    <script>
+      function setGiscusTheme(theme: string) {
+        const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+        iframe?.contentWindow?.postMessage(
+          { giscus: { setConfig: { theme } } },
+          'https://giscus.app'
+        );
+      }
+      const initial = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      // giscus may not be loaded yet; apply once its frame appears
+      if (initial === 'dark') {
+        window.addEventListener('message', (e) => {
+          if (e.origin === 'https://giscus.app' && e.data?.giscus?.discussion) setGiscusTheme('dark');
+        }, { once: true });
+      }
+      window.addEventListener('themechange', (e) => setGiscusTheme((e as CustomEvent).detail));
+    </script>
   </section>
 ) : null}
 
