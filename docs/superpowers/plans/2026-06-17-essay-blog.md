@@ -236,10 +236,11 @@ const CHARS_PER_MINUTE = 500;
 /** 마크다운 본문에서 읽는 시간(분, 최소 1)을 계산한다. */
 export function readingTime(markdown: string): number {
   const text = markdown
-    .replace(/```[\s\S]*?```/g, '')   // 코드 블록 제거
-    .replace(/`[^`]*`/g, '')          // 인라인 코드 제거
-    .replace(/[#>*_~\-`!\[\]()]/g, '') // 마크다운 기호 제거
-    .replace(/\s+/g, '');              // 공백 제거
+    .replace(/```[\s\S]*?```/g, '')      // 코드 블록 제거
+    .replace(/`[^`]*`/g, '')             // 인라인 코드 제거
+    .replace(/^#{1,6}\s+.*$/gm, '')      // 제목 줄 전체 제거
+    .replace(/[#>*_~\-`!\[\]()]/g, '')   // 마크다운 기호 제거
+    .replace(/\s+/g, '');                // 공백 제거
   const minutes = Math.ceil(text.length / CHARS_PER_MINUTE);
   return Math.max(1, minutes);
 }
