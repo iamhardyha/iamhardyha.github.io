@@ -1,0 +1,27 @@
+---
+import { SITE, NAV } from '../consts';
+import ThemeToggle from './ThemeToggle.astro';
+---
+<header class="nav">
+  <div class="wide nav__inner">
+    <a href="/" class="nav__logo">{SITE.title}</a>
+    <nav class="nav__links">
+      {NAV.map((item) => <a href={item.href} class="nav__link">{item.label}</a>)}
+      <a href="/search" class="nav__link" aria-label="검색">🔍</a>
+      <ThemeToggle />
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav { border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+  .nav__inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .nav__logo { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: var(--text); }
+  .nav__links { display: flex; align-items: center; gap: 18px; }
+  .nav__link { color: var(--text-muted); font-size: 0.95rem; }
+  .nav__link:hover { color: var(--text); }
+  @media (max-width: 640px) {
+    .nav__links { gap: 12px; }
+    .nav__link { font-size: 0.85rem; }
+  }
+</style>
