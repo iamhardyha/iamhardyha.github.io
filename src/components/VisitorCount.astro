@@ -1,0 +1,51 @@
+---
+import { GOATCOUNTER } from '../consts';
+const enabled = !!GOATCOUNTER.code;
+---
+{enabled && (
+  <div class="visitors" data-gc-code={GOATCOUNTER.code} data-gc-token={GOATCOUNTER.apiToken}>
+    <span class="visitors__item">누적 <strong id="gc-total">—</strong></span>
+    <span class="visitors__item visitors__today" id="gc-today-wrap" hidden>· 오늘 <strong id="gc-today">—</strong></span>
+  </div>
+)}
+
+<script>
+  const el = document.querySelector<HTMLElement>('.visitors');
+  if (el) {
+    const code = el.dataset.gcCode;
+    const token = el.dataset.gcToken;
+    const fmt = (n: number | string) => Number(String(n).replace(/,/g, '')).toLocaleString('ko-KR');
+
+    if (code) {
+      fetch(`https://${code}.goatcounter.com/counter/TOTAL.json`)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((d) => {
+          const total = document.getElementById('gc-total');
+          if (total) total.textContent = fmt(d.count_unique ?? d.count ?? 0);
+        })
+        .catch(() => {});
+
+      if (token) {
+        const today = new Date().toISOString().slice(0, 10);
+        fetch(`https://${code}.goatcounter.com/api/v0/stats/total?start=${today}&end=${today}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+          .then((r) => (r.ok ? r.json() : Promise.reject()))
+          .then((d) => {
+            const wrap = document.getElementById('gc-today-wrap');
+            const todayEl = document.getElementById('gc-today');
+            if (wrap && todayEl) {
+              todayEl.textContent = fmt(d.total ?? 0);
+              wrap.hidden = false;
+            }
+          })
+          .catch(() => {});
+      }
+    }
+  }
+</script>
+
+<style>
+  .visitors { color: var(--text-muted); font-size: 0.8rem; display: flex; gap: 6px; }
+  .visitors strong { color: var(--text); }
+</style>
