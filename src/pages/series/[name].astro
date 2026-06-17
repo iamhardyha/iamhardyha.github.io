@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { publishedSorted, collectSeries } from '../../utils/posts';
+
+export const getStaticPaths = (async () => {
+  const all = await getCollection('posts');
+  const published = publishedSorted(all);
+  return collectSeries(all).map((name) => ({
+    params: { name },
+    props: { name, posts: published.filter((p) => p.data.series === name).reverse() },
+  }));
+}) satisfies GetStaticPaths;
+
+const { name, posts } = Astro.props;
+---
+<BaseLayout title={`시리즈: ${name}`}>
+  <div class="container">
+    <p class="series-label">📚 시리즈</p>
+    <h1 class="page-title">{name}</h1>
+    {posts.map((post) => <PostCard post={post} />)}
+  </div>
+</BaseLayout>
+
+<style>
+  .series-label { color: var(--accent); margin: 30px 0 0; }
+  .page-title { font-family: var(--serif); font-size: 2rem; padding: 6px 0 10px; }
+</style>
