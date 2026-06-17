@@ -1,0 +1,43 @@
+---
+import { GISCUS } from '../consts';
+const enabled = GISCUS.repoId && GISCUS.categoryId;
+---
+{enabled ? (
+  <section class="comments">
+    <script
+      src="https://giscus.app/client.js"
+      data-repo={GISCUS.repo}
+      data-repo-id={GISCUS.repoId}
+      data-category={GISCUS.category}
+      data-category-id={GISCUS.categoryId}
+      data-mapping="pathname"
+      data-strict="1"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-theme="light"
+      data-lang="ko"
+      crossorigin="anonymous"
+      async
+    ></script>
+    <script>
+      function setGiscusTheme(theme: string) {
+        const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+        iframe?.contentWindow?.postMessage(
+          { giscus: { setConfig: { theme } } },
+          'https://giscus.app'
+        );
+      }
+      const initial = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      // giscus may not be loaded yet; apply once its frame appears
+      if (initial === 'dark') {
+        window.addEventListener('message', (e) => {
+          if (e.origin === 'https://giscus.app' && e.data?.giscus?.discussion) setGiscusTheme('dark');
+        }, { once: true });
+      }
+      window.addEventListener('themechange', (e) => setGiscusTheme((e as CustomEvent).detail));
+    </script>
+  </section>
+) : null}
+
+<style>.comments { margin-top: 60px; border-top: 1px solid var(--border); padding-top: 30px; }</style>

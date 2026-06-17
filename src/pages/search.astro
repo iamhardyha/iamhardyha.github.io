@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Search from 'astro-pagefind/components/Search';
+---
+<BaseLayout title="검색">
+  <div class="container">
+    <h1 class="page-title">검색</h1>
+    <Search id="search" className="pagefind-ui" uiOptions={{ showImages: false }} />
+  </div>
+</BaseLayout>
+
+<style>.page-title { font-family: var(--serif); font-size: 2rem; padding: 30px 0 10px; }</style>

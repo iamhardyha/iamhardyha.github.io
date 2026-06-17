@@ -1,0 +1,16 @@
+---
+interface Props { pubDate: Date; minutes: number; tags?: string[]; }
+const { pubDate, minutes, tags = [] } = Astro.props;
+const dateStr = pubDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+<div class="meta">
+  <span>{dateStr}</span>
+  <span aria-hidden="true">·</span>
+  <span>{minutes}분 읽기</span>
+  {tags.length > 0 && <span aria-hidden="true">·</span>}
+  {tags.map((t) => <a class="meta__tag" href={`/topics/${encodeURIComponent(t)}`}>{t}</a>)}
+</div>
+<style>
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--text-muted); font-size: 0.85rem; }
+  .meta__tag { color: var(--accent); }
+</style>
