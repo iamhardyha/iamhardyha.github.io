@@ -1,0 +1,20 @@
+---
+import PostMeta from './PostMeta.astro';
+import { readingTime } from '../utils/reading-time';
+import type { CollectionEntry } from 'astro:content';
+interface Props { post: CollectionEntry<'posts'>; }
+const { post } = Astro.props;
+const minutes = readingTime(post.body ?? '');
+---
+<article class="card">
+  <a href={`/posts/${post.id}`} class="card__link">
+    <h3 class="card__title">{post.data.title}</h3>
+    <p class="card__desc">{post.data.description}</p>
+  </a>
+  <PostMeta pubDate={post.data.pubDate} minutes={minutes} tags={post.data.tags} />
+</article>
+<style>
+  .card { padding: 24px 0; border-bottom: 1px solid var(--border); }
+  .card__title { font-family: var(--serif); font-size: 1.4rem; margin: 0 0 6px; color: var(--text); }
+  .card__desc { color: var(--text-muted); margin: 0 0 10px; }
+</style>

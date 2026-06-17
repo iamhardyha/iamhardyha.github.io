@@ -1,0 +1,23 @@
+---
+import PostMeta from './PostMeta.astro';
+import { readingTime } from '../utils/reading-time';
+import type { CollectionEntry } from 'astro:content';
+interface Props { post: CollectionEntry<'posts'>; }
+const { post } = Astro.props;
+const minutes = readingTime(post.body ?? '');
+---
+<article class="featured">
+  <a href={`/posts/${post.id}`} class="featured__link">
+    <span class="featured__label">Featured</span>
+    <h2 class="featured__title">{post.data.title}</h2>
+    <p class="featured__desc">{post.data.description}</p>
+  </a>
+  <PostMeta pubDate={post.data.pubDate} minutes={minutes} tags={post.data.tags} />
+</article>
+<style>
+  .featured { padding: 40px 0; border-bottom: 2px solid var(--border); }
+  .featured__label { color: var(--accent); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  .featured__title { font-family: var(--serif); font-size: 2.2rem; line-height: 1.2; margin: 10px 0; color: var(--text); }
+  .featured__desc { color: var(--text-muted); font-size: 1.1rem; margin: 0 0 14px; }
+  @media (max-width: 640px) { .featured__title { font-size: 1.7rem; } }
+</style>
