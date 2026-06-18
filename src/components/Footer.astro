@@ -17,9 +17,10 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
-  .footer { border-top: 1px solid var(--border); margin-top: 80px; padding: 30px 0; }
-  .footer__inner { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-  .footer__links { display: flex; gap: 16px; }
-  .footer__links a { color: var(--text-muted); font-size: 0.9rem; }
+  .footer { border-top: 1px solid var(--border); margin-top: 80px; padding: 36px 0; }
+  .footer__inner { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  .footer__links { display: flex; gap: 20px; }
+  .footer__links a { color: var(--text-muted); font-size: 0.9rem; transition: color 0.15s ease; }
+  .footer__links a:hover { color: var(--text); }
   .footer__copy { color: var(--text-muted); font-size: 0.85rem; margin: 0; }
 </style>

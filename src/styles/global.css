@@ -6,17 +6,18 @@
   --border: #e6e6e6;
   --accent: #1a8917;
   --accent-hover: #156d12;
+  --scrim: rgba(0, 0, 0, 0.1);
   --serif: Georgia, "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
   --sans: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
   --content-width: 680px;
 }
 
 :root[data-theme="dark"] {
-  --bg: #16181c;
-  --bg-soft: #1f2227;
-  --text: #e8e6e3;
-  --text-muted: #9aa0a6;
-  --border: #2c3036;
+  --bg: #17181b;
+  --bg-soft: #21242a;
+  --text: #ecebe8;
+  --text-muted: #a6abb1;
+  --border: #343a44;
   --accent: #4caf50;
   --accent-hover: #66bb6a;
 }

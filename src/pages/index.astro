@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import FeaturedPost from '../components/FeaturedPost.astro';
 import PostCard from '../components/PostCard.astro';
 import { publishedSorted } from '../utils/posts';
+import { SITE } from '../consts';
 
 const posts = publishedSorted(await getCollection('posts'));
 const [featured, ...rest] = posts;
@@ -11,17 +12,41 @@ const latest = rest.slice(0, 6);
 ---
 <BaseLayout>
   <div class="container">
+    <header class="masthead">
+      <p class="masthead__tagline">{SITE.tagline}</p>
+      <p class="masthead__desc">{SITE.description}</p>
+    </header>
+
     {featured && <FeaturedPost post={featured} />}
+
     <section class="latest">
       <h2 class="latest__heading">최근 글</h2>
       {latest.map((post) => <PostCard post={post} />)}
-      <a href="/writing" class="latest__more">전체 글 보기 →</a>
+      <a href="/writing" class="latest__more">전체 글 보기 <span aria-hidden="true">→</span></a>
     </section>
   </div>
 </BaseLayout>
 
 <style>
-  .latest { padding-top: 20px; }
-  .latest__heading { font-family: var(--serif); font-size: 1.1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-  .latest__more { display: inline-block; margin-top: 24px; font-weight: 600; }
+  .masthead { padding: 52px 0 36px; border-bottom: 1px solid var(--border); }
+  .masthead__tagline { font-family: var(--serif); font-size: 1.35rem; line-height: 1.4; color: var(--text); margin: 0; }
+  .masthead__desc { font-size: 0.95rem; color: var(--text-muted); margin: 8px 0 0; }
+
+  .latest { padding: 36px 0 24px; border-top: 2px solid var(--border); }
+  .latest__heading {
+    font-family: var(--sans); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+    margin: 0 0 26px;
+  }
+  .latest__more {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px; font-weight: 600; font-size: 0.95rem;
+  }
+  .latest__more span { transition: transform 0.2s ease; }
+  .latest__more:hover span { transform: translateX(3px); }
+
+  @media (max-width: 640px) {
+    .masthead { padding: 36px 0 28px; }
+    .masthead__tagline { font-size: 1.2rem; }
+  }
 </style>

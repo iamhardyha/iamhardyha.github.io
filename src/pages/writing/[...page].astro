@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import type { GetStaticPaths, Page } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { publishedSorted } from '../../utils/posts';
 import { SITE } from '../../consts';
 import type { CollectionEntry } from 'astro:content';
@@ -16,17 +17,26 @@ const { page } = Astro.props as { page: Page<CollectionEntry<'posts'>> };
 ---
 <BaseLayout title="Writing">
   <div class="container">
-    <h1 class="page-title">Writing</h1>
-    {page.data.map((post) => <PostCard post={post} />)}
+    <PageHeader title="Writing" subtitle={`글 ${page.total}편`} />
+    <div class="list">
+      {page.data.map((post) => <PostCard post={post} />)}
+    </div>
     <nav class="pager">
-      {page.url.prev && <a href={page.url.prev}>← 이전</a>}
-      <span>{page.currentPage} / {page.lastPage}</span>
-      {page.url.next && <a href={page.url.next}>다음 →</a>}
+      {page.url.prev ? <a href={page.url.prev}>← 이전</a> : <span class="pager__spacer"></span>}
+      <span class="pager__count">{page.currentPage} / {page.lastPage}</span>
+      {page.url.next ? <a href={page.url.next}>다음 →</a> : <span class="pager__spacer"></span>}
     </nav>
   </div>
 </BaseLayout>
 
 <style>
-  .page-title { font-family: var(--serif); font-size: 2rem; padding: 30px 0 10px; }
-  .pager { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; color: var(--text-muted); }
+  .pager {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+    margin-top: 8px; padding: 24px 0 36px; border-top: 1px solid var(--border);
+    color: var(--text-muted); font-size: 0.9rem;
+  }
+  .pager a { font-weight: 600; color: var(--accent); }
+  .pager a:first-child { justify-self: start; }
+  .pager a:last-child { justify-self: end; }
+  .pager__count { text-align: center; font-variant-numeric: tabular-nums; }
 </style>

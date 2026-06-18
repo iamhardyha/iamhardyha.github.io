@@ -2,15 +2,30 @@
 interface Props { pubDate: Date; minutes: number; tags?: string[]; }
 const { pubDate, minutes, tags = [] } = Astro.props;
 const dateStr = pubDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+const isoDate = pubDate.toISOString().slice(0, 10);
 ---
 <div class="meta">
-  <span>{dateStr}</span>
-  <span aria-hidden="true">·</span>
+  <time datetime={isoDate}>{dateStr}</time>
+  <span class="meta__dot" aria-hidden="true">·</span>
   <span>{minutes}분 읽기</span>
-  {tags.length > 0 && <span aria-hidden="true">·</span>}
-  {tags.map((t) => <a class="meta__tag" href={`/topics/${encodeURIComponent(t)}`}>{t}</a>)}
+  {tags.length > 0 && (
+    <span class="meta__tags">
+      {tags.map((t) => <a class="meta__tag" href={`/topics/${encodeURIComponent(t)}`}>{t}</a>)}
+    </span>
+  )}
 </div>
 <style>
-  .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; color: var(--text-muted); font-size: 0.85rem; }
-  .meta__tag { color: var(--accent); }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    color: var(--text-muted); font-size: 0.85rem;
+  }
+  .meta__dot { color: var(--border); }
+  .meta__tags { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-left: 4px; }
+  .meta__tag {
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+    color: var(--accent); font-size: 0.78rem; line-height: 1.4;
+    padding: 3px 10px; border-radius: 100px;
+    transition: background 0.15s ease;
+  }
+  .meta__tag:hover { background: color-mix(in srgb, var(--accent) 22%, var(--bg)); }
 </style>

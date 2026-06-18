@@ -5,23 +5,103 @@ import ThemeToggle from './ThemeToggle.astro';
 <header class="nav">
   <div class="wide nav__inner">
     <a href="/" class="nav__logo">{SITE.title}</a>
-    <nav class="nav__links">
-      {NAV.map((item) => <a href={item.href} class="nav__link">{item.label}</a>)}
-      <a href="/search" class="nav__link" aria-label="검색">🔍</a>
+
+    <div class="nav__right">
+      <nav class="nav__links" aria-label="주요 메뉴">
+        {NAV.map((item) => <a href={item.href} class="nav__link">{item.label}</a>)}
+      </nav>
+
+      <a href="/search" class="nav__icon" aria-label="검색">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </a>
+
       <ThemeToggle />
-    </nav>
+
+      <button id="nav-toggle" class="nav__burger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </div>
+
+  <nav id="nav-menu" class="nav__menu" aria-label="모바일 메뉴" hidden>
+    {NAV.map((item) => <a href={item.href} class="nav__menu-link">{item.label}</a>)}
+  </nav>
 </header>
 
 <style>
   .nav { border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
   .nav__inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
-  .nav__logo { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: var(--text); }
+  .nav__logo { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: var(--text); white-space: nowrap; }
+
+  .nav__right { display: flex; align-items: center; gap: 18px; }
   .nav__links { display: flex; align-items: center; gap: 18px; }
   .nav__link { color: var(--text-muted); font-size: 0.95rem; }
   .nav__link:hover { color: var(--text); }
+
+  .nav__icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 8px; color: var(--text-muted);
+  }
+  .nav__icon:hover { color: var(--text); background: var(--bg-soft); }
+
+  /* Hamburger — hidden on desktop */
+  .nav__burger {
+    display: none; flex-direction: column; justify-content: center; gap: 5px;
+    width: 40px; height: 40px; padding: 9px 8px; background: none; border: none;
+    border-radius: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .nav__burger:hover { background: var(--bg-soft); }
+  .nav__burger span {
+    display: block; height: 2px; width: 100%; border-radius: 2px; background: var(--text);
+    transition: transform 0.25s ease, opacity 0.18s ease;
+  }
+  .nav__burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav__burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .nav__burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Slide-down panel */
+  .nav__menu {
+    display: flex; flex-direction: column; border-top: 1px solid var(--border); background: var(--bg);
+    animation: navMenuIn 0.22s ease;
+  }
+  .nav__menu[hidden] { display: none; }
+  .nav__menu-link {
+    padding: 14px 20px; font-size: 1.05rem; color: var(--text);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav__menu-link:last-child { border-bottom: none; }
+  .nav__menu-link:active { background: var(--bg-soft); }
+  @keyframes navMenuIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
   @media (max-width: 640px) {
-    .nav__links { gap: 12px; }
-    .nav__link { font-size: 0.85rem; }
+    .nav__links { display: none; }
+    .nav__burger { display: flex; }
+    .nav__right { gap: 4px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav__burger span, .nav__menu { transition: none; animation: none; }
   }
 </style>
+
+<script>
+  const btn = document.getElementById('nav-toggle');
+  const menu = document.getElementById('nav-menu');
+  function setOpen(open: boolean) {
+    if (!btn || !menu) return;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? '메뉴 닫기' : '메뉴 열기');
+    menu.hidden = !open;
+  }
+  btn?.addEventListener('click', () => {
+    setOpen(btn.getAttribute('aria-expanded') !== 'true');
+  });
+  menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && btn?.getAttribute('aria-expanded') === 'true') {
+      setOpen(false);
+      btn.focus();
+    }
+  });
+</script>

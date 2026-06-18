@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
 
 const projects = [
   {
@@ -18,26 +19,47 @@ const projects = [
 ---
 <BaseLayout title="Projects">
   <div class="container">
-    <h1 class="page-title">Projects</h1>
-    {projects.map((p) => (
-      <a class="proj" href={p.href} target="_blank" rel="noopener">
-        <div>
-          <span class="proj__badge">{p.badge}</span>
-          <h3 class="proj__title">{p.title}</h3>
-          <p class="proj__desc">{p.desc}</p>
-        </div>
-        <span class="proj__arrow">→</span>
-      </a>
-    ))}
+    <PageHeader title="Projects" subtitle="만들고 있는 것들" />
+    <div class="proj-list">
+      {projects.map((p) => (
+        <a class="proj" href={p.href} target="_blank" rel="noopener">
+          <div>
+            <span class="proj__badge">{p.badge}</span>
+            <h3 class="proj__title">{p.title}</h3>
+            <p class="proj__desc">{p.desc}</p>
+          </div>
+          <span class="proj__arrow" aria-hidden="true">→</span>
+        </a>
+      ))}
+    </div>
   </div>
 </BaseLayout>
 
 <style>
-  .page-title { font-family: var(--serif); font-size: 2rem; padding: 30px 0 10px; }
-  .proj { display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; color: var(--text); }
-  .proj:hover { border-color: var(--accent); }
-  .proj__badge { color: var(--accent); font-size: 0.75rem; letter-spacing: 0.08em; }
-  .proj__title { font-family: var(--serif); margin: 6px 0 4px; }
+  .proj-list { display: flex; flex-direction: column; gap: 14px; padding: 28px 0 40px; }
+  .proj {
+    display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    border: 1px solid var(--border); border-radius: 12px; padding: 24px; color: var(--text);
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .proj:hover {
+    border-color: var(--accent); transform: translateY(-1px);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+  .proj__badge {
+    color: var(--accent); font-size: 0.72rem; letter-spacing: 0.12em;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .proj__title { font-family: var(--serif); font-size: 1.4rem; margin: 8px 0 4px; color: var(--text); }
   .proj__desc { color: var(--text-muted); margin: 0; }
-  .proj__arrow { font-size: 1.4rem; color: var(--text-muted); }
+  .proj__arrow {
+    font-size: 1.3rem; color: var(--text-muted); flex: none;
+    transition: transform 0.2s ease, color 0.15s ease;
+  }
+  .proj:hover .proj__arrow { transform: translateX(4px); color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) {
+    .proj, .proj__arrow { transition: none; }
+    .proj:hover { transform: none; }
+    .proj:hover .proj__arrow { transform: none; }
+  }
 </style>

@@ -15,9 +15,26 @@ const minutes = readingTime(post.body ?? '');
   <PostMeta pubDate={post.data.pubDate} minutes={minutes} tags={post.data.tags} />
 </article>
 <style>
-  .featured { padding: 40px 0; border-bottom: 2px solid var(--border); }
-  .featured__label { color: var(--accent); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
-  .featured__title { font-family: var(--serif); font-size: 2.2rem; line-height: 1.2; margin: 10px 0; color: var(--text); }
-  .featured__desc { color: var(--text-muted); font-size: 1.1rem; margin: 0 0 14px; }
-  @media (max-width: 640px) { .featured__title { font-size: 1.7rem; } }
+  .featured { padding: 44px 0; }
+  .featured__link { display: block; }
+  .featured__label {
+    display: block; color: var(--accent); font-size: 0.72rem;
+    letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .featured__title {
+    font-family: var(--serif); font-size: 2.5rem; line-height: 1.16;
+    letter-spacing: -0.01em; margin: 0 0 14px; color: var(--text);
+    transition: color 0.15s ease;
+  }
+  .featured__link:hover .featured__title { color: var(--accent); }
+  .featured__desc {
+    color: var(--text-muted); font-size: 1.18rem; line-height: 1.55;
+    margin: 0 0 20px;
+  }
+  @media (max-width: 640px) {
+    .featured { padding: 32px 0; }
+    .featured__title { font-size: 1.85rem; }
+    .featured__desc { font-size: 1.05rem; }
+  }
 </style>

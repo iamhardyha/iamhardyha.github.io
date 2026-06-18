@@ -4,7 +4,7 @@ import { SITE, SOCIAL } from '../consts';
 ---
 <BaseLayout title="About">
   <div class="container about">
-    <img class="about__avatar" src={SITE.avatar} alt={SITE.author} />
+    <img class="about__avatar" src={SITE.avatar} alt={SITE.author} width="104" height="104" />
     <h1 class="about__name">{SITE.author}</h1>
     <p class="about__tagline">{SITE.tagline}</p>
     <div class="prose-lite">
@@ -26,10 +26,17 @@ import { SITE, SOCIAL } from '../consts';
 </BaseLayout>
 
 <style>
-  .about { padding-top: 40px; text-align: center; }
-  .about__avatar { width: 96px; height: 96px; border-radius: 50%; }
-  .about__name { font-family: var(--serif); font-size: 1.8rem; margin: 16px 0 4px; }
-  .about__tagline { color: var(--text-muted); margin: 0 0 24px; }
-  .prose-lite { font-family: var(--serif); font-size: 1.1rem; line-height: 1.85; text-align: left; }
-  .about__links { display: flex; justify-content: center; gap: 16px; margin-top: 30px; }
+  .about { padding: 56px 0 20px; text-align: center; max-width: 600px; }
+  .about__avatar { width: 104px; height: 104px; border-radius: 50%; border: 1px solid var(--border); }
+  .about__name { font-family: var(--serif); font-size: 1.9rem; margin: 20px 0 6px; color: var(--text); }
+  .about__tagline { color: var(--text-muted); margin: 0 0 32px; font-size: 1.02rem; }
+  .prose-lite { font-family: var(--serif); font-size: 1.15rem; line-height: 1.85; text-align: left; color: var(--text); }
+  .prose-lite p { margin: 1.1em 0; }
+  .about__links { display: flex; justify-content: center; gap: 12px; margin-top: 36px; }
+  .about__links a {
+    border: 1px solid var(--border); border-radius: 999px; padding: 8px 18px;
+    color: var(--text); font-size: 0.92rem;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .about__links a:hover { border-color: var(--accent); color: var(--accent); }
 </style>

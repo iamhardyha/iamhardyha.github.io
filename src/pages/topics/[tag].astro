@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import type { GetStaticPaths } from 'astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
+import PageHeader from '../../components/PageHeader.astro';
 import { publishedSorted, collectTags } from '../../utils/posts';
 
 export const getStaticPaths = (async () => {
@@ -19,9 +20,9 @@ const { tag, posts } = Astro.props;
 ---
 <BaseLayout title={`#${tag}`}>
   <div class="container">
-    <h1 class="page-title">#{tag}</h1>
-    {posts.map((post) => <PostCard post={post} />)}
+    <PageHeader eyebrow="Topic" title={`#${tag}`} subtitle={`글 ${posts.length}편`} />
+    <div class="list">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
   </div>
 </BaseLayout>
-
-<style>.page-title { font-family: var(--serif); font-size: 2rem; padding: 30px 0 10px; }</style>

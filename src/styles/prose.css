@@ -1,13 +1,20 @@
 .prose { font-family: var(--serif); font-size: 1.18rem; line-height: 1.85; color: var(--text); }
-.prose h2 { font-size: 1.6rem; margin-top: 2em; }
-.prose h3 { font-size: 1.3rem; margin-top: 1.6em; }
+.prose > :first-child { margin-top: 0; }
+.prose h2 { font-size: 1.6rem; line-height: 1.3; margin: 2em 0 0.6em; letter-spacing: -0.01em; }
+.prose h3 { font-size: 1.3rem; line-height: 1.35; margin: 1.6em 0 0.5em; }
 .prose p { margin: 1.2em 0; }
-.prose a { text-decoration: underline; }
-.prose blockquote { border-left: 3px solid var(--accent); margin: 1.5em 0; padding: 0.2em 1em; color: var(--text-muted); }
-.prose pre { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 0.9rem; }
+.prose a { text-decoration: underline; text-underline-offset: 2px; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); transition: text-decoration-color 0.15s ease; }
+.prose a:hover { text-decoration-color: var(--accent); }
+.prose ul, .prose ol { padding-left: 1.4em; margin: 1.2em 0; }
+.prose li { margin: 0.4em 0; }
+.prose blockquote { border-left: 3px solid var(--accent); margin: 1.5em 0; padding: 0.2em 1.1em; color: var(--text-muted); font-style: italic; }
+.prose blockquote p { margin: 0.4em 0; }
+.prose hr { border: none; border-top: 1px solid var(--border); margin: 2.4em 0; }
+.prose pre { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 0.9rem; line-height: 1.7; margin: 1.5em 0; }
 .prose code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .prose :not(pre) > code { background: var(--bg-soft); padding: 2px 5px; border-radius: 4px; font-size: 0.9em; }
-.prose img { max-width: 100%; border-radius: 8px; }
+.prose img { max-width: 100%; border-radius: 8px; margin: 1.5em 0; }
+.prose figcaption { font-family: var(--sans); font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-top: 0.6em; }
 
 /* Shiki dual-theme: light by default, dark when site theme is dark */
 .prose :is(pre, code) span { color: var(--shiki-light); }
