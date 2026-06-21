@@ -34,10 +34,15 @@ const minutes = readingTime(post.body ?? '');
   .post-header { padding: 56px 0 0; }
   .post-header--cover { background-size: cover; background-position: center; padding: 120px 0 0; position: relative; }
   .post-header--cover::after { content:""; position:absolute; inset:0; background: linear-gradient(to bottom, var(--scrim), var(--bg) 95%); }
-  /* Divider follows the content column, not the full viewport width */
-  .post-header__inner { position: relative; z-index: 1; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+  /* Divider hierarchy on the post page (deliberate, three tiers):
+       1. nav / footer  → full-width hairline (page chrome)
+       2. header ↔ body, body ↔ comments → column-width hairline (section boundary, here)
+       3. in-article `---` → three-dot asterism (content pause, see prose.css)
+     Same weight is reused only for the same role, so no two boundaries read as a
+     doubled-up line. This hairline follows the content column, not the viewport. */
+  .post-header__inner { position: relative; z-index: 1; padding-bottom: 36px; border-bottom: 1px solid var(--border); }
   /* Breathing room between the divider and the article body */
-  .post-content { padding-top: 44px; }
+  .post-content { padding-top: 48px; }
 
   .post-header__kicker {
     display: inline-flex; align-items: center; gap: 6px;
@@ -46,10 +51,12 @@ const minutes = readingTime(post.body ?? '');
   .post-header__title {
     font-family: var(--serif); font-size: 2.6rem; line-height: 1.18;
     letter-spacing: -0.01em; margin: 0 0 18px; color: var(--text);
+    text-wrap: balance; word-break: keep-all;
   }
   .post-header__lead {
     font-family: var(--serif); font-size: 1.3rem; line-height: 1.55;
-    font-style: italic; color: var(--text-muted); margin: 0 0 24px;
+    font-style: italic; color: var(--text-muted); margin: 0 0 28px;
+    text-wrap: pretty; word-break: keep-all;
   }
   @media (max-width: 640px) {
     .post-header { padding: 40px 0 0; }
