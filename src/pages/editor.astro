@@ -1,0 +1,185 @@
+---
+// Local-only post editor. The save/list/load endpoints live in a dev-only Vite
+// plugin (src/lib/editor/editorPlugin.mjs), so the deployed site has nothing to
+// talk to. Two more guards keep it invisible in production:
+//   1. this frontmatter redirects /editor → home in a prod build, and
+//   2. the <style>/<script> below are `is:inline` and rendered ONLY in dev,
+//      so they are never bundled into dist/ (no orphaned editor assets ship).
+const isDev = import.meta.env.DEV;
+if (!isDev) {
+  return Astro.redirect('/');
+}
+
+const EDITOR_CSS = `
+  :root {
+    color-scheme: light dark;
+    --bg: #fbfbfa; --panel: #ffffff; --ink: #1a1a1a; --muted: #6b6b6b;
+    --line: #e6e6e6; --accent: #1a8917; --err: #c0392b;
+    --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181d; --panel: #1e2127; --ink: #e8e8e8; --muted: #9aa0aa;
+      --line: #343a44; --accent: #4caf50; --err: #ff6b6b;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+    display: flex; flex-direction: column;
+  }
+  .bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line);
+    background: var(--panel); flex-wrap: wrap;
+  }
+  .bar__left { display: flex; align-items: center; gap: 10px; }
+  .bar__right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    font-size: 11px; color: var(--muted); border: 1px solid var(--line);
+    border-radius: 999px; padding: 1px 8px;
+  }
+  button, select {
+    font: inherit; font-size: 13px; padding: 6px 10px; border: 1px solid var(--line);
+    border-radius: 7px; background: var(--panel); color: var(--ink); cursor: pointer;
+  }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  kbd { font: inherit; opacity: 0.85; }
+  .status {
+    margin: 0; padding: 8px 16px; min-height: 1.4em; font-size: 13px;
+    color: var(--muted); border-bottom: 1px solid var(--line);
+  }
+  .status[data-kind='ok'] { color: var(--accent); }
+  .status[data-kind='err'] { color: var(--err); }
+  .grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: 0; }
+  .form {
+    display: flex; flex-direction: column; gap: 14px; padding: 18px;
+    overflow: auto; border-right: 1px solid var(--line);
+  }
+  .form label { display: flex; flex-direction: column; gap: 5px; }
+  .form label > span { font-size: 13px; font-weight: 600; }
+  .form label em { font-style: normal; color: var(--muted); font-weight: 400; }
+  .form .row { display: flex; gap: 6px; }
+  .form .row input { flex: 1; }
+  .form .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
+  .form .check { flex-direction: row; align-items: center; gap: 8px; }
+  .form .check input { width: auto; }
+  input, textarea {
+    font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line);
+    border-radius: 7px; background: var(--bg); color: var(--ink); width: 100%;
+  }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  small { color: var(--muted); font-size: 12px; }
+  small code, code { font-family: var(--mono); font-size: 12px; }
+  .grow { flex: 1; min-height: 0; }
+  #f-body {
+    flex: 1; min-height: 320px; resize: vertical; font-family: var(--mono);
+    font-size: 13.5px; line-height: 1.7; tab-size: 2;
+  }
+  .preview { display: flex; flex-direction: column; min-height: 0; background: var(--bg); }
+  .preview__head {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted);
+  }
+  .preview__head code { color: var(--ink); }
+  .preview pre {
+    margin: 0; padding: 16px; overflow: auto; flex: 1; font-family: var(--mono);
+    font-size: 12.5px; line-height: 1.65; white-space: pre-wrap; word-break: break-word;
+  }
+  @media (max-width: 760px) {
+    .grid { grid-template-columns: 1fr; }
+    .form { border-right: none; border-bottom: 1px solid var(--line); }
+    .preview { min-height: 240px; }
+  }
+`;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>로컬 에디터 · dev only</title>
+    {isDev && <style is:inline set:html={EDITOR_CSS} />}
+  </head>
+  <body>
+    <header class="bar">
+      <div class="bar__left">
+        <strong>✍︎ 로컬 에디터</strong>
+        <span class="badge">dev only</span>
+      </div>
+      <div class="bar__right">
+        <select id="loadSelect" aria-label="기존 글 불러오기">
+          <option value="">기존 글 불러오기…</option>
+        </select>
+        <button id="newBtn" type="button">새 글</button>
+        <button id="previewBtn" type="button">실제 미리보기 ↗</button>
+        <button id="saveBtn" type="button" class="primary">저장 <kbd>⌘S</kbd></button>
+      </div>
+    </header>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <main class="grid">
+      <section class="form">
+        <label>
+          <span>제목 <em>title</em></span>
+          <input id="f-title" type="text" placeholder="글 제목" autocomplete="off" />
+        </label>
+
+        <label>
+          <span>슬러그 <em>slug</em> · 파일명</span>
+          <span class="row">
+            <input id="f-slug" type="text" placeholder="my-first-post" autocomplete="off" />
+            <button id="slugBtn" type="button" title="제목에서 자동 생성">auto</button>
+          </span>
+          <small>URL이 됩니다: <code>/posts/<span id="slug-echo">…</span></code></small>
+        </label>
+
+        <label>
+          <span>설명 <em>description</em> · 부제/리드</span>
+          <textarea id="f-description" rows="2" placeholder="목록과 상세 상단에 보이는 한 줄 설명"></textarea>
+        </label>
+
+        <div class="cols">
+          <label>
+            <span>날짜 <em>pubDate</em></span>
+            <input id="f-pubDate" type="date" />
+          </label>
+          <label class="check">
+            <input id="f-draft" type="checkbox" />
+            <span>초안 <em>draft</em> (목록 숨김)</span>
+          </label>
+        </div>
+
+        <label>
+          <span>태그 <em>tags</em> · 쉼표로 구분</span>
+          <input id="f-tags" type="text" placeholder="AI, 글쓰기, 회고" autocomplete="off" />
+        </label>
+
+        <label>
+          <span>시리즈 <em>series</em> · 선택</span>
+          <input id="f-series" type="text" placeholder="(비워도 됨)" autocomplete="off" />
+        </label>
+
+        <label class="grow">
+          <span>본문 <em>Markdown</em></span>
+          <textarea id="f-body" placeholder="# 여기에 본문을 마크다운으로…"></textarea>
+        </label>
+      </section>
+
+      <section class="preview">
+        <div class="preview__head">
+          <span>저장될 파일 미리보기</span>
+          <code id="preview-path">src/content/posts/….md</code>
+        </div>
+        <pre id="preview-file"><code></code></pre>
+      </section>
+    </main>
+
+    {isDev && <script is:inline type="module" src="/src/lib/editor/editorClient.ts" />}
+  </body>
+</html>
