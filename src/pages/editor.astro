@@ -46,6 +46,7 @@ const EDITOR_CSS = `
     border-radius: 7px; background: var(--panel); color: var(--ink); cursor: pointer;
   }
   button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  button.accent { border-color: var(--accent); color: var(--accent); font-weight: 600; }
   kbd { font: inherit; opacity: 0.85; }
   .status {
     margin: 0; padding: 8px 16px; min-height: 1.4em; font-size: 13px;
@@ -116,7 +117,9 @@ const EDITOR_CSS = `
           <option value="">기존 글 불러오기…</option>
         </select>
         <button id="newBtn" type="button">새 글</button>
+        <button id="draftBtn" type="button" title="초안(draft)으로 저장 — 빌드·공개 안 됨">임시 저장</button>
         <button id="previewBtn" type="button">실제 미리보기 ↗</button>
+        <button id="publishBtn" type="button" class="accent" title="draft 해제 후 저장 — git push 하면 공개">발행</button>
         <button id="saveBtn" type="button" class="primary">저장 <kbd>⌘S</kbd></button>
       </div>
     </header>

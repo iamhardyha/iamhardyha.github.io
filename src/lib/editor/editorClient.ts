@@ -97,7 +97,13 @@ async function refreshList(): Promise<void> {
     for (const post of json.data) {
       const opt = document.createElement('option');
       opt.value = post.slug;
-      opt.textContent = post.slug;
+      let isDraft = false;
+      try {
+        isDraft = parsePost(post.raw).meta.draft;
+      } catch {
+        /* a malformed file just shows as non-draft */
+      }
+      opt.textContent = isDraft ? `${post.slug} · 초안` : post.slug;
       els.loadSelect.appendChild(opt);
     }
     els.loadSelect.value = current;
@@ -119,7 +125,7 @@ async function loadPost(slug: string): Promise<void> {
   setStatus(`불러옴: ${slug}.md`, 'ok');
 }
 
-async function save({ silent = false } = {}): Promise<boolean> {
+async function save({ silent = false, label = '저장됨' } = {}): Promise<boolean> {
   const { meta, slug, body } = gather();
   const check = validatePostInput({ ...meta, slug });
   if (!check.ok) {
@@ -149,9 +155,29 @@ async function save({ silent = false } = {}): Promise<boolean> {
     return false;
   }
   loadedSlug = slug;
-  if (!silent) setStatus(`저장됨 → ${json.data.path}`, 'ok');
+  if (!silent) setStatus(`${label} → ${json.data.path}`, 'ok');
   await refreshList();
   return true;
+}
+
+/** Save as a hidden draft (draft: true). The file is written but never built. */
+async function saveDraft(): Promise<void> {
+  els.draft.checked = true;
+  render();
+  await save({ label: '임시 저장됨 · 초안(비공개)' });
+}
+
+/** Flip draft off and save, so the next `git push` makes it public. */
+async function publish(): Promise<void> {
+  if (!els.slug.value.trim()) {
+    setStatus('발행하려면 slug이 필요합니다.', 'err');
+    return;
+  }
+  const ok = confirm('이 글을 발행 상태로 저장할까요? (draft 해제)\n실제 공개는 git push 후 적용됩니다.');
+  if (!ok) return;
+  els.draft.checked = false;
+  render();
+  await save({ label: '발행 준비됨 · git push 하면 공개' });
 }
 
 // ---- wiring -----------------------------------------------------------------
@@ -166,6 +192,8 @@ function newPost(): void {
 els.loadSelect.addEventListener('change', () => loadPost(els.loadSelect.value));
 $<HTMLButtonElement>('newBtn').addEventListener('click', newPost);
 $<HTMLButtonElement>('saveBtn').addEventListener('click', () => save());
+$<HTMLButtonElement>('draftBtn').addEventListener('click', saveDraft);
+$<HTMLButtonElement>('publishBtn').addEventListener('click', publish);
 $<HTMLButtonElement>('slugBtn').addEventListener('click', () => {
   els.slug.value = slugify(els.title.value);
   render();
