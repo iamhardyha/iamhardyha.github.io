@@ -16,11 +16,18 @@ const EDITOR_CSS = `
     --bg: #fbfbfa; --panel: #ffffff; --ink: #1a1a1a; --muted: #6b6b6b;
     --line: #e6e6e6; --accent: #1a8917; --err: #c0392b;
     --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+    /* Tokens the reused prose.css expects (mirrors src/styles/global.css). */
+    --serif: Georgia, 'Nanum Myeongjo', 'Apple SD Gothic Neo', serif;
+    --sans: Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+    --text: #242424; --text-muted: #6b6b6b; --border: #e6e6e6; --bg-soft: #fafafa;
+    --shiki-light: var(--text); --shiki-dark: var(--text);
+    --shiki-light-bg: var(--bg-soft); --shiki-dark-bg: var(--bg-soft);
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #16181d; --panel: #1e2127; --ink: #e8e8e8; --muted: #9aa0aa;
       --line: #343a44; --accent: #4caf50; --err: #ff6b6b;
+      --text: #ecebe8; --text-muted: #a6abb1; --border: #343a44; --bg-soft: #21242a;
     }
   }
   * { box-sizing: border-box; }
@@ -85,7 +92,16 @@ const EDITOR_CSS = `
     padding: 10px 16px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted);
   }
   .preview__head code { color: var(--ink); }
-  .preview pre {
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+  .seg__btn { border: none; border-radius: 0; background: transparent; padding: 5px 12px; font-size: 12px; color: var(--muted); }
+  .seg__btn.is-active { background: var(--accent); color: #fff; }
+  /* Rendered live preview — reuses .prose from the site so it matches articles. */
+  .preview__body { flex: 1; overflow: auto; padding: 28px 30px; background: var(--bg); }
+  .preview__body[hidden] { display: none; }
+  .preview__body .ph { color: var(--muted); font-family: var(--sans); font-style: italic; }
+  .preview__body.prose > :first-child { margin-top: 0; }
+  /* File-source view (scoped so it never touches rendered code blocks). */
+  #preview-file {
     margin: 0; padding: 16px; overflow: auto; flex: 1; font-family: var(--mono);
     font-size: 12.5px; line-height: 1.65; white-space: pre-wrap; word-break: break-word;
   }
@@ -176,10 +192,14 @@ const EDITOR_CSS = `
 
       <section class="preview">
         <div class="preview__head">
-          <span>저장될 파일 미리보기</span>
+          <div class="seg">
+            <button id="tabPreview" type="button" class="seg__btn is-active">미리보기</button>
+            <button id="tabSource" type="button" class="seg__btn">파일 원문</button>
+          </div>
           <code id="preview-path">src/content/posts/….md</code>
         </div>
-        <pre id="preview-file"><code></code></pre>
+        <div id="preview-rendered" class="prose preview__body"></div>
+        <pre id="preview-file" hidden><code></code></pre>
       </section>
     </main>
 

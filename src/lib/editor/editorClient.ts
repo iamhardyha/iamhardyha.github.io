@@ -7,7 +7,15 @@
  * anything, so it (and its endpoints) leave no trace in `dist/`. The Vite dev
  * server transforms this TS on the fly when the browser requests it.
  */
+import { marked } from 'marked';
 import { slugify, serializePost, parsePost, validatePostInput, type PostMeta } from './postFile';
+// The real site styles, reused so the live preview matches published articles.
+// Dev-only import (this whole module never ships), injected by Vite as a <style>.
+import '../../styles/prose.css';
+
+// CommonMark + GFM, no auto <br> on single newlines — matches Astro's markdown.
+// innerHTML of own content in a local single-user tool: no sanitizer needed.
+marked.setOptions({ gfm: true, breaks: false });
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -21,14 +29,20 @@ const els = {
   series: $<HTMLInputElement>('f-series'),
   body: $<HTMLTextAreaElement>('f-body'),
   status: $<HTMLParagraphElement>('status'),
+  previewPre: $<HTMLPreElement>('preview-file'),
   previewFile: $<HTMLElement>('preview-file').querySelector('code')!,
+  previewRendered: $<HTMLElement>('preview-rendered'),
   previewPath: $<HTMLElement>('preview-path'),
+  tabPreview: $<HTMLButtonElement>('tabPreview'),
+  tabSource: $<HTMLButtonElement>('tabSource'),
   slugEcho: $<HTMLElement>('slug-echo'),
   loadSelect: $<HTMLSelectElement>('loadSelect'),
 };
 
 const STORAGE_KEY = 'editor:autosave';
+const MODE_KEY = 'editor:previewMode';
 let loadedSlug = ''; // the slug currently open (edits to it are implicit overwrites)
+let previewMode: 'rendered' | 'source' = 'rendered';
 
 const todayISO = (): string => new Date().toISOString().slice(0, 10);
 
@@ -78,11 +92,29 @@ function render(): void {
   const { meta, slug, body } = gather();
   els.slugEcho.textContent = slug || '…';
   els.previewPath.textContent = `src/content/posts/${slug || '…'}.md`;
+  // Live rendered HTML (left visible by default) and the raw file (toggle).
+  els.previewRendered.innerHTML = body.trim()
+    ? (marked.parse(body) as string)
+    : '<p class="ph">본문을 입력하면 여기에 실시간으로 보입니다.</p>';
   els.previewFile.textContent = serializePost({ meta, body });
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ meta, slug, body }));
   } catch {
     /* storage full / disabled — autosave is best-effort */
+  }
+}
+
+function setPreviewMode(mode: 'rendered' | 'source'): void {
+  previewMode = mode;
+  const rendered = mode === 'rendered';
+  els.previewRendered.hidden = !rendered;
+  els.previewPre.hidden = rendered;
+  els.tabPreview.classList.toggle('is-active', rendered);
+  els.tabSource.classList.toggle('is-active', !rendered);
+  try {
+    localStorage.setItem(MODE_KEY, mode);
+  } catch {
+    /* best-effort */
   }
 }
 
@@ -194,6 +226,8 @@ $<HTMLButtonElement>('newBtn').addEventListener('click', newPost);
 $<HTMLButtonElement>('saveBtn').addEventListener('click', () => save());
 $<HTMLButtonElement>('draftBtn').addEventListener('click', saveDraft);
 $<HTMLButtonElement>('publishBtn').addEventListener('click', publish);
+els.tabPreview.addEventListener('click', () => setPreviewMode('rendered'));
+els.tabSource.addEventListener('click', () => setPreviewMode('source'));
 $<HTMLButtonElement>('slugBtn').addEventListener('click', () => {
   els.slug.value = slugify(els.title.value);
   render();
@@ -232,6 +266,7 @@ document.addEventListener('keydown', (e) => {
 // ---- boot -------------------------------------------------------------------
 function boot(): void {
   els.pubDate.value = todayISO();
+  setPreviewMode(localStorage.getItem(MODE_KEY) === 'source' ? 'source' : 'rendered');
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
