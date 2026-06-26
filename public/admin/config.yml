@@ -1,0 +1,75 @@
+# Sveltia CMS configuration (Decap-compatible).
+# Docs: https://github.com/sveltia/sveltia-cms
+
+backend:
+  name: github
+  repo: iamhardyha/iamhardyha.github.io
+  branch: main
+  # OAuth relay: a static site can't do the GitHub token exchange itself, so
+  # this must point at YOUR deployed Sveltia CMS Auth worker (Cloudflare, free).
+  # Replace the placeholder with your worker origin (no trailing slash).
+  # See docs/admin-cms-setup.md for the 10-minute setup.
+  base_url: https://REPLACE-WITH-YOUR-WORKER.workers.dev
+
+# Editorial workflow off: saving commits straight to `main` (then GitHub Actions
+# rebuilds). New posts default to draft: true, so nothing goes public by accident.
+publish_mode: simple
+
+# Image uploads land in public/uploads and are referenced as /uploads/<file>.
+media_folder: public/uploads
+public_folder: /uploads
+
+locale: en
+
+collections:
+  - name: posts
+    label: 글 (Posts)
+    label_singular: 글
+    folder: src/content/posts
+    create: true
+    delete: true
+    extension: md
+    format: yaml-frontmatter
+    # The filename (= URL slug). Kept as an explicit field so you can use a
+    # curated English slug for Korean titles, matching the existing posts.
+    slug: '{{fields.slug}}'
+    identifier_field: title
+    summary: '{{title}}  ·  {{#if draft}}초안{{/if}}'
+    sortable_fields: [pubDate, title]
+    fields:
+      - { name: title, label: 제목 (title), widget: string }
+      - {
+          name: slug,
+          label: 슬러그 (파일명·URL),
+          widget: string,
+          hint: '영문 소문자/숫자/하이픈 (예: my-first-post)',
+          pattern: ['^[a-z0-9]+(?:-[a-z0-9]+)*$', '영문 소문자·숫자·하이픈만'],
+        }
+      - { name: description, label: 설명 (리드/부제), widget: text }
+      - {
+          name: pubDate,
+          label: 발행일 (pubDate),
+          widget: datetime,
+          date_format: 'YYYY-MM-DD',
+          time_format: false,
+          format: 'YYYY-MM-DD',
+        }
+      - {
+          name: updatedDate,
+          label: 수정일 (선택),
+          widget: datetime,
+          required: false,
+          date_format: 'YYYY-MM-DD',
+          time_format: false,
+          format: 'YYYY-MM-DD',
+        }
+      - { name: tags, label: 태그, widget: list, required: false, default: [] }
+      - { name: series, label: 시리즈 (선택), widget: string, required: false }
+      - { name: cover, label: 커버 이미지 (선택), widget: image, required: false }
+      - {
+          name: draft,
+          label: 초안 (목록·발행 숨김),
+          widget: boolean,
+          default: true,
+        }
+      - { name: body, label: 본문 (Markdown), widget: markdown }

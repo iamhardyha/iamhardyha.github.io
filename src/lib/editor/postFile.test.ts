@@ -124,6 +124,62 @@ describe('parsePost (round-trip)', () => {
   });
 });
 
+describe('parsePost (CMS interop)', () => {
+  it('reads block-style YAML tag lists (as Sveltia/Decap writes them)', () => {
+    const raw = [
+      '---',
+      'title: "X"',
+      'description: "Y"',
+      'pubDate: 2026-06-27',
+      'tags:',
+      '  - AI',
+      '  - 글쓰기',
+      'draft: true',
+      '---',
+      '',
+      '본문.',
+      '',
+    ].join('\n');
+    const parsed = parsePost(raw);
+    expect(parsed.meta.tags).toEqual(['AI', '글쓰기']);
+    expect(parsed.meta.draft).toBe(true);
+    expect(parsed.body).toBe('본문.\n');
+  });
+
+  it('handles single-quoted and unquoted scalar values', () => {
+    const raw = [
+      '---',
+      "title: 'She said'",
+      'description: 좋은 글입니다',
+      'pubDate: 2026-06-27',
+      'draft: false',
+      '---',
+      '',
+      '본문.',
+    ].join('\n');
+    const parsed = parsePost(raw);
+    expect(parsed.meta.title).toBe('She said');
+    expect(parsed.meta.description).toBe('좋은 글입니다');
+  });
+
+  it('ignores unknown frontmatter keys (e.g. a CMS slug field)', () => {
+    const raw = [
+      '---',
+      'title: "X"',
+      'slug: my-post',
+      'description: "Y"',
+      'pubDate: 2026-06-27',
+      'draft: false',
+      '---',
+      '',
+      '본문.',
+    ].join('\n');
+    const parsed = parsePost(raw);
+    expect(parsed.meta.title).toBe('X');
+    expect(parsed.body).toBe('본문.\n');
+  });
+});
+
 describe('validatePostInput', () => {
   it('passes a well-formed input', () => {
     const r = validatePostInput({ ...baseMeta, slug: 'good-tools-change-questions' });

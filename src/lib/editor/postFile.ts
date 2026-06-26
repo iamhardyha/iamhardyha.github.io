@@ -79,11 +79,14 @@ export function serializePost({ meta, body }: PostFile): string {
   return `${lines.join('\n')}\n\n${trimmedBody}\n`;
 }
 
-/** Strip surrounding double quotes and unescape a YAML double-quoted scalar. */
+/** Strip surrounding quotes and unescape a YAML scalar (double- or single-quoted). */
 function unquote(value: string): string {
   const trimmed = value.trim();
-  if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+  if (trimmed.length >= 2 && trimmed.startsWith('"') && trimmed.endsWith('"')) {
     return trimmed.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+  }
+  if (trimmed.length >= 2 && trimmed.startsWith("'") && trimmed.endsWith("'")) {
+    return trimmed.slice(1, -1).replace(/''/g, "'"); // YAML: '' is an escaped quote
   }
   return trimmed;
 }
@@ -110,8 +113,9 @@ export function parsePost(raw: string): PostFile {
   const body = raw.slice(match[0].length).replace(/^\n+/, '');
 
   const meta = emptyMeta();
-  for (const line of frontmatter.split('\n')) {
-    const kv = line.match(/^([A-Za-z]+):\s*(.*)$/);
+  const lines = frontmatter.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const kv = lines[i].match(/^([A-Za-z]+):\s*(.*)$/);
     if (!kv) continue;
     const [, key, value] = kv;
     switch (key) {
@@ -128,7 +132,19 @@ export function parsePost(raw: string): PostFile {
         meta.updatedDate = value.trim();
         break;
       case 'tags':
-        meta.tags = parseTags(value);
+        if (value.trim()) {
+          meta.tags = parseTags(value); // flow style: tags: ["a", "b"]
+        } else {
+          // block style (as Sveltia/Decap writes):  tags:\n  - a\n  - b
+          const items: string[] = [];
+          let j = i + 1;
+          while (j < lines.length && /^\s*-\s+/.test(lines[j])) {
+            items.push(unquote(lines[j].replace(/^\s*-\s+/, '')));
+            j += 1;
+          }
+          meta.tags = items.filter(Boolean);
+          i = j - 1;
+        }
         break;
       case 'series':
         meta.series = unquote(value);

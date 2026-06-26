@@ -12,7 +12,7 @@ export default defineConfig({
   vite: { plugins: [editorPlugin()] },
   integrations: [
     mdx(),
-    sitemap({ filter: (page) => !page.includes('/editor') }),
+    sitemap({ filter: (page) => !page.includes('/editor') && !page.includes('/admin') }),
     pagefind(),
   ],
   markdown: {
