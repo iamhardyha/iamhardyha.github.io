@@ -1,0 +1,26 @@
+---
+// Dev-only "as published" preview. Renders a post through the SAME PostLayout
+// and markdown pipeline (Shiki, prose.css) as the real /posts/[...id] route, so
+// what you see here is byte-for-byte how it will look once published — with one
+// deliberate difference: drafts are included, so you can preview unpublished work.
+//
+// In a production build getStaticPaths returns [], so NO /preview/* pages are
+// emitted: nothing ships, nothing to find, nothing in the sitemap.
+// NOTE: the folder must NOT start with "_" — Astro excludes underscore-prefixed
+// paths from routing, which would make this 404 in dev too.
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  if (!import.meta.env.DEV) return [];
+  const posts = await getCollection('posts'); // includes drafts, unlike /posts
+  return posts.map((post) => ({ params: { id: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<PostLayout post={post}>
+  <Content />
+</PostLayout>

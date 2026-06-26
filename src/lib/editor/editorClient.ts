@@ -32,8 +32,10 @@ const els = {
   previewPre: $<HTMLPreElement>('preview-file'),
   previewFile: $<HTMLElement>('preview-file').querySelector('code')!,
   previewRendered: $<HTMLElement>('preview-rendered'),
+  previewFrame: $<HTMLIFrameElement>('preview-frame'),
   previewPath: $<HTMLElement>('preview-path'),
   tabPreview: $<HTMLButtonElement>('tabPreview'),
+  tabPublished: $<HTMLButtonElement>('tabPublished'),
   tabSource: $<HTMLButtonElement>('tabSource'),
   slugEcho: $<HTMLElement>('slug-echo'),
   loadSelect: $<HTMLSelectElement>('loadSelect'),
@@ -41,8 +43,10 @@ const els = {
 
 const STORAGE_KEY = 'editor:autosave';
 const MODE_KEY = 'editor:previewMode';
+const PUBLISHED_DEBOUNCE_MS = 900; // refresh the real-render iframe after typing pauses
 let loadedSlug = ''; // the slug currently open (edits to it are implicit overwrites)
-let previewMode: 'rendered' | 'source' = 'rendered';
+let previewMode: 'rendered' | 'published' | 'source' = 'rendered';
+let publishedTimer: ReturnType<typeof setTimeout> | undefined;
 
 const todayISO = (): string => new Date().toISOString().slice(0, 10);
 
@@ -97,6 +101,7 @@ function render(): void {
     ? (marked.parse(body) as string)
     : '<p class="ph">본문을 입력하면 여기에 실시간으로 보입니다.</p>';
   els.previewFile.textContent = serializePost({ meta, body });
+  if (previewMode === 'published') schedulePublished();
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ meta, slug, body }));
   } catch {
@@ -104,18 +109,69 @@ function render(): void {
   }
 }
 
-function setPreviewMode(mode: 'rendered' | 'source'): void {
+function setPreviewMode(mode: 'rendered' | 'published' | 'source'): void {
   previewMode = mode;
-  const rendered = mode === 'rendered';
-  els.previewRendered.hidden = !rendered;
-  els.previewPre.hidden = rendered;
-  els.tabPreview.classList.toggle('is-active', rendered);
-  els.tabSource.classList.toggle('is-active', !rendered);
+  els.previewRendered.hidden = mode !== 'rendered';
+  els.previewFrame.hidden = mode !== 'published';
+  els.previewPre.hidden = mode !== 'source';
+  els.tabPreview.classList.toggle('is-active', mode === 'rendered');
+  els.tabPublished.classList.toggle('is-active', mode === 'published');
+  els.tabSource.classList.toggle('is-active', mode === 'source');
   try {
     localStorage.setItem(MODE_KEY, mode);
   } catch {
     /* best-effort */
   }
+  if (mode === 'published') refreshPublished();
+}
+
+/** Show a styled placeholder inside the iframe (same-origin srcdoc). */
+function frameMessage(text: string): void {
+  els.previewFrame.removeAttribute('src');
+  els.previewFrame.srcdoc =
+    `<body style="margin:0;font-family:sans-serif;color:#888;display:flex;` +
+    `align-items:center;justify-content:center;height:100vh;text-align:center;` +
+    `padding:24px;line-height:1.6">${text}</body>`;
+}
+
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Render the post exactly as published: save it, then point the iframe at the
+ * dev-only /__preview/<slug> route (real PostLayout + Shiki). Scroll position
+ * is preserved across the reload so it doesn't jump while you edit.
+ */
+async function refreshPublished(): Promise<void> {
+  const { meta, slug } = gather();
+  const check = validatePostInput({ ...meta, slug });
+  if (!check.ok) {
+    frameMessage('발행 모습을 보려면 먼저 채워주세요:<br><br>' + check.errors.join('<br>'));
+    return;
+  }
+  const ok = await save({ silent: true });
+  if (!ok) return;
+  await delay(200); // let Astro's content watcher pick up a brand-new file
+
+  let prevScroll = 0;
+  try {
+    prevScroll = els.previewFrame.contentWindow?.scrollY ?? 0;
+  } catch {
+    /* first load — nothing to preserve */
+  }
+  els.previewFrame.onload = () => {
+    try {
+      els.previewFrame.contentWindow?.scrollTo(0, prevScroll);
+    } catch {
+      /* ignore */
+    }
+  };
+  els.previewFrame.removeAttribute('srcdoc');
+  els.previewFrame.src = `/preview/${encodeURIComponent(slug)}?t=${Date.now()}`;
+}
+
+function schedulePublished(): void {
+  clearTimeout(publishedTimer);
+  publishedTimer = setTimeout(refreshPublished, PUBLISHED_DEBOUNCE_MS);
 }
 
 // ---- server calls -----------------------------------------------------------
@@ -227,6 +283,7 @@ $<HTMLButtonElement>('saveBtn').addEventListener('click', () => save());
 $<HTMLButtonElement>('draftBtn').addEventListener('click', saveDraft);
 $<HTMLButtonElement>('publishBtn').addEventListener('click', publish);
 els.tabPreview.addEventListener('click', () => setPreviewMode('rendered'));
+els.tabPublished.addEventListener('click', () => setPreviewMode('published'));
 els.tabSource.addEventListener('click', () => setPreviewMode('source'));
 $<HTMLButtonElement>('slugBtn').addEventListener('click', () => {
   els.slug.value = slugify(els.title.value);
@@ -240,7 +297,8 @@ $<HTMLButtonElement>('previewBtn').addEventListener('click', async () => {
     return;
   }
   const saved = await save({ silent: true });
-  if (saved) window.open(`/posts/${slug}`, '_blank');
+  // /preview renders drafts too (unlike /posts), so this works pre-publish.
+  if (saved) window.open(`/preview/${slug}`, '_blank');
 });
 
 for (const el of [
@@ -266,7 +324,6 @@ document.addEventListener('keydown', (e) => {
 // ---- boot -------------------------------------------------------------------
 function boot(): void {
   els.pubDate.value = todayISO();
-  setPreviewMode(localStorage.getItem(MODE_KEY) === 'source' ? 'source' : 'rendered');
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
@@ -279,6 +336,10 @@ function boot(): void {
       /* ignore corrupt autosave */
     }
   }
+  const storedMode = localStorage.getItem(MODE_KEY);
+  setPreviewMode(
+    storedMode === 'source' || storedMode === 'published' ? storedMode : 'rendered',
+  );
   render();
   refreshList();
 }

@@ -98,6 +98,8 @@ const EDITOR_CSS = `
   /* Rendered live preview — reuses .prose from the site so it matches articles. */
   .preview__body { flex: 1; overflow: auto; padding: 28px 30px; background: var(--bg); }
   .preview__body[hidden] { display: none; }
+  .preview__frame { flex: 1; width: 100%; border: 0; background: var(--bg); }
+  .preview__frame[hidden] { display: none; }
   .preview__body .ph { color: var(--muted); font-family: var(--sans); font-style: italic; }
   .preview__body.prose > :first-child { margin-top: 0; }
   /* File-source view (scoped so it never touches rendered code blocks). */
@@ -193,12 +195,14 @@ const EDITOR_CSS = `
       <section class="preview">
         <div class="preview__head">
           <div class="seg">
-            <button id="tabPreview" type="button" class="seg__btn is-active">미리보기</button>
-            <button id="tabSource" type="button" class="seg__btn">파일 원문</button>
+            <button id="tabPreview" type="button" class="seg__btn is-active" title="입력하는 즉시 갱신(근사)">미리보기</button>
+            <button id="tabPublished" type="button" class="seg__btn" title="실제 발행 페이지 그대로 — 타이핑 멈추면 갱신">발행 모습</button>
+            <button id="tabSource" type="button" class="seg__btn" title="저장될 파일 원문">파일 원문</button>
           </div>
           <code id="preview-path">src/content/posts/….md</code>
         </div>
         <div id="preview-rendered" class="prose preview__body"></div>
+        <iframe id="preview-frame" class="preview__frame" title="발행 모습 미리보기" hidden></iframe>
         <pre id="preview-file" hidden><code></code></pre>
       </section>
     </main>
